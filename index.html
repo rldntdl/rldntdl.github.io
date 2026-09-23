@@ -592,7 +592,7 @@
       }
 
       // 속도가 육안으로 멈췄다고 느껴지는 극소수치(0.0001)에 도달할 때까지 감속 지속
-      if (currentVelocity > 0.0001) {
+      if (currentVelocity > 0.00001) {
         requestAnimationFrame(animateStop);
       } else {
         isSpinning = false;
