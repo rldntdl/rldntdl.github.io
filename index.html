@@ -449,7 +449,7 @@
       const progress = Math.min(elapsed / duration, 1);
       
       // Easing function: easeOutCubic (slows down cleanly at the end)
-      const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+      const easeOut = (t) => 1 - Math.pow(1 - t, 4);
       
       const currentRotate = (rotateAngle * Math.PI / 180) * easeOut(progress);
       currentAngle = initialAngle + currentRotate;
