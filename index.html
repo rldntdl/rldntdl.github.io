@@ -580,6 +580,7 @@
       lastFrameTime = now;
       
       // ✨ 마찰 엔진 로직: 시간 제한 없이 현재 속도에 곱해져 0으로 점진 수렴
+      // 0.9994 마찰계수와 임계값 0.00001 사용 시 정지까지 약 14.1초 소요
       const friction = Math.pow(0.9994, dt);
       currentVelocity *= friction;
       currentAngle += currentVelocity * dt;
@@ -591,8 +592,8 @@
         document.getElementById('tickOverlay').innerText = hovered.name;
       }
 
-      // 속도가 육안으로 멈췄다고 느껴지는 극소수치(0.0001)에 도달할 때까지 감속 지속
-      if (currentVelocity > 0.00001) {
+      // 속도가 육안으로 멈췄다고 느껴지는 극소수치(0.00002)에 도달할 때까지 감속 지속
+      if (currentVelocity > 0.00002) {
         requestAnimationFrame(animateStop);
       } else {
         isSpinning = false;
