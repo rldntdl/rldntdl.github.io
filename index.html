@@ -50,7 +50,6 @@
     }
     canvas { border-radius: 50%; box-shadow: 0 0 25px rgba(0,0,0,0.6); }
 
-    /* 실시간 닉네임 표시 레터박스 */
     .tick-overlay {
       position: absolute;
       top: 50%; left: 0; width: 100%;
@@ -66,7 +65,6 @@
       pointer-events: none;
     }
 
-    /* 최종 당첨자 오버레이 (실시간 레터박스와 디자인 통일) */
     .winner-overlay {
       position: absolute;
       top: 50%; left: 0; width: 100%;
@@ -87,7 +85,6 @@
 
     .action-buttons { display: flex; gap: 10px; width: 100%; max-width: 450px; margin-top: 20px; }
     
-    /* 섞기, 시작, 중지 버튼 통일된 스타일 적용 */
     .shuffle-btn { flex: 0.2; background: #ffcc00; color: #fff; font-size: 1.3rem; padding: 15px; border-radius: 30px; box-shadow: 0 4px 15px rgba(255,204,0,0.3); }
     .shuffle-btn:hover { background: #e6b800; transform: scale(1.02); }
     .shuffle-btn:disabled { background: #555; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
@@ -191,7 +188,8 @@
 
     <h2>3. 참여자 명단 및 칸수 조정</h2>
     <div class="input-group">
-      <input type="text" id="userName" placeholder="닉네임">
+      <!-- ime-mode: active; 를 통해 한글 자판 기본 활성화 -->
+      <input type="text" id="userName" placeholder="닉네임" style="ime-mode: active;">
       <input type="number" id="userHearts" placeholder="하트 수">
       <button class="btn-primary" onclick="addParticipant()">추가</button>
     </div>
@@ -436,7 +434,7 @@
   let isSpinning = false;
   let isContinuous = false; 
   let lastFrameTime = 0; 
-  let currentVelocity = 0; // 현재 회전 속도를 저장하는 변수
+  let currentVelocity = 0; 
 
   function shuffleWheel() {
     if (wheelOrderIds.length === 0 || isSpinning) return;
@@ -534,7 +532,6 @@
     const dt = now - lastFrameTime;
     lastFrameTime = now;
     
-    // 빠른 무한 회전 속도 설정
     currentVelocity = 0.048; 
     currentAngle += currentVelocity * dt; 
     drawWheel();
@@ -575,18 +572,22 @@
     const initialAngle = currentAngle; 
     const initialVelocity = currentVelocity; 
     
-    // 자연스러운 정지를 위한 물리 엔진 계산식 (현재 속도를 이어받아 서서히 감속)
-    const extraSpins = Math.floor(Math.random() * 3) + 3; // 3~5바퀴 더 돌고 정지
-    const totalRotation = (initialVelocity * 7000 / 2) + (extraSpins * Math.PI * 2) + (Math.random() * Math.PI * 2);
-    const finalDuration = totalRotation * 2 / initialVelocity; // 초기 속도와 동기화된 감속 시간 계산
+    // 시간 제한 완전 해제: 물리적 거리(totalRotation)와 초기 속도(initialVelocity)에 의해 온전히 결정됨
+    const extraSpins = Math.floor(Math.random() * 3) + 10; 
+    const totalRotation = (extraSpins * Math.PI * 2) + (Math.random() * Math.PI * 2);
+    
+    // 4차 함수(Quartic ease-out)의 미분 값에 따른 완벽한 정지 시간 동기화 공식
+    const finalDuration = (4 * totalRotation) / initialVelocity; 
 
     function animateStop(now) {
       const elapsed = now - startTimestamp;
       let progress = elapsed / finalDuration;
+      
+      // 진행도가 1(100%)을 넘지 않도록 처리
       if (progress > 1) progress = 1;
       
-      // 자연스러운 이차곡선 감속 (Quadratic ease-out)
-      const easeOut = 1 - Math.pow(1 - progress, 2);
+      // 4차 곡선(Quartic ease-out): 마지막에 속도가 0으로 아주 천천히 수렴함
+      const easeOut = 1 - Math.pow(1 - progress, 4);
       currentAngle = initialAngle + totalRotation * easeOut;
 
       drawWheel();
