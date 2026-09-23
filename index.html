@@ -1,573 +1,404 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>커스텀 룰렛 게임</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            margin: 0;
-            min-height: 100vh;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>팬더TV 기념일 룰렛 시스템</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
+    body { background-color: #1a1a24; color: #fff; padding: 20px; }
+    
+    .container { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; flex-wrap: wrap; }
+    .panel { background: #252636; border-radius: 12px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .left-panel { flex: 1.2; min-width: 550px; }
+    .right-panel { flex: 0.8; min-width: 400px; display: flex; flex-direction: column; align-items: center; }
 
-        h1 { color: #333; margin-bottom: 20px; }
+    h2 { font-size: 1.2rem; color: #ff3366; margin-bottom: 15px; border-bottom: 2px solid #33354a; padding-bottom: 8px; }
 
-        .main-wrapper {
-            display: flex;
-            gap: 30px;
-            width: 100%;
-            max-width: 1100px;
-            justify-content: center;
-            align-items: stretch;
-            flex-wrap: wrap;
-            height: 700px; 
-        }
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; text-align: center; font-size: 0.9rem; }
+    th, td { border: 1px solid #3d3f58; padding: 8px 6px; }
+    th { background-color: #2e3047; color: #ffcc00; }
+    td input[type="number"], td input[type="text"] {
+      width: 90%; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; text-align: center; border-radius: 4px; padding: 4px;
+    }
 
-        .panel {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
-            height: 100%; 
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-        }
+    /* Controls & Inputs */
+    .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+    .input-group input { flex: 1; padding: 10px; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; border-radius: 6px; }
+    
+    button { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: 0.2s; }
+    .btn-primary { background: #ff3366; color: #fff; padding: 10px 15px; }
+    .btn-primary:hover { background: #e02e5a; }
+    .btn-secondary { background: #4a4d6d; color: #fff; padding: 6px 12px; }
+    .btn-secondary:hover { background: #5c6087; }
+    .btn-danger { background: #e74c3c; color: #fff; padding: 4px 8px; }
 
-        .panel-controls {
-            flex: 1;
-            min-width: 320px;
-        }
+    /* +/- Buttons */
+    .adj-btn { width: 26px; height: 26px; border-radius: 50%; font-size: 14px; margin: 0 2px; }
+    .btn-plus { background: #2ecc71; color: #fff; }
+    .btn-minus { background: #e67e22; color: #fff; }
 
-        .panel-game {
-            flex: 1.5;
-            min-width: 340px;
-            align-items: center;
-        }
+    /* Wheel Area */
+    .wheel-container { position: relative; margin: 20px 0; }
+    .wheel-pointer {
+      position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #ff3366;
+      z-index: 10;
+    }
+    canvas { border-radius: 50%; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
 
-        h3 { 
-            margin-top: 0; 
-            color: #444; 
-            border-bottom: 2px solid #f0f0f0; 
-            padding-bottom: 10px; 
-            margin-bottom: 20px;
-        }
+    .spin-btn { background: #ff3366; color: #fff; font-size: 1.3rem; padding: 15px 40px; border-radius: 30px; margin-top: 10px; width: 100%; max-width: 300px; box-shadow: 0 4px 15px rgba(255,51,102,0.4); }
+    .spin-btn:hover { background: #ff4d79; transform: scale(1.03); }
+    .spin-btn:disabled { background: #555; cursor: not-allowed; transform: none; }
 
-        .divider {
-            margin: 20px 0;
-            border: 0;
-            border-top: 1px solid #eee;
-        }
-
-        /* 입력 그룹 스타일 */
-        .input-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px; 
-            align-items: center;
-            width: 100%;
-        }
-
-        input {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        input:focus { outline: 2px solid #2196F3; border-color: transparent; }
-
-        #titleInput, #nameInput { 
-            flex: 1; 
-            min-width: 0; 
-        }
-
-        #weightInput { 
-            width: 60px;
-            text-align: center;
-            flex: none;
-        }
-
-        button {
-            padding: 10px 15px;
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.2s;
-            font-size: 14px;
-        }
-
-        .btn-add { 
-            background-color: #4CAF50; 
-            color: white; 
-            flex: none;
-            white-space: nowrap;
-        }
-        .btn-add:hover { background-color: #45a049; }
-
-        /* 하단 게임 컨트롤 버튼들 */
-        .control-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-            width: 100%;
-            max-width: 412px; 
-            margin-top: auto; 
-        }
-
-        .btn-large {
-            flex: 1;
-            padding: 15px;
-            font-size: 1.1em;
-            color: white;
-        }
-
-        .btn-shuffle { background-color: #9C27B0; }
-        .btn-shuffle:hover { background-color: #7B1FA2; }
-        
-        .btn-start { background-color: #4CAF50; }
-        .btn-start:hover { background-color: #45a049; }
-        
-        .btn-stop { background-color: #ff5252; }
-        .btn-stop:hover { background-color: #e53935; }
-        
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-
-        /* 참가자 목록 */
-        ul { 
-            list-style: none; 
-            padding: 0; 
-            flex: 1; 
-            overflow-y: auto; 
-            min-height: 0; 
-            scrollbar-width: thin; 
-            scrollbar-color: #ddd transparent;
-        }
-        ul::-webkit-scrollbar { width: 6px; }
-        ul::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 10px; }
-
-        li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid #f0f0f0;
-            margin-bottom: 5px;
-        }
-        li:last-child { border-bottom: none; }
-        
-        .name-text { font-weight: 500; font-size: 15px; }
-        
-        .list-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .weight-edit {
-            width: 45px;
-            padding: 6px;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-        }
-
-        .btn-delete {
-            background-color: #ff5252;
-            color: white;
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-        .btn-delete:hover { background-color: #e53935; }
-
-        /* 결과 표시 모달 */
-        #resultModal {
-            font-size: 2em;
-            font-weight: 800;
-            color: #2196F3;
-            height: 50px;
-            margin-bottom: 10px;
-            text-align: center;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-
-        /* 룰렛 캔버스 영역 */
-        .wheel-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
-            margin: 10px 0;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
-            border: 6px solid black;
-            border-radius: 50%;
-            box-sizing: content-box;
-        }
-
-        canvas { 
-            width: 100%; 
-            height: 100%;
-            border-radius: 50%;
-        }
-
-        .arrow {
-            position: absolute;
-            top: 0px;   
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0; 
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 23px solid red;
-            z-index: 10;
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
-        }
-    </style>
+    .result-box { margin-top: 15px; font-size: 1.4rem; font-weight: bold; color: #ffcc00; text-align: center; height: 35px; }
+  </style>
 </head>
 <body>
 
-    <div class="main-wrapper">
-        
-        <div class="panel panel-controls">
-            <h3>📝 룰렛 타이틀 설정</h3>
-            <div class="input-group">
-                <input type="text" id="titleInput" placeholder="제목을 입력하세요" value="🍀행운의 룰렛🍀">
-                <button class="btn-add" onclick="updateTitle()">변경</button>
-            </div>
+<div class="container">
+  <!-- 좌측 관리 패널 -->
+  <div class="panel left-panel">
+    
+    <!-- 1. 하트 / 칸수 기준 설정 -->
+    <h2>1. 하트/칸수 자동 계산 기준 설정</h2>
+    <table id="criteriaTable">
+      <thead>
+        <tr>
+          <th>하트 기준</th>
+          <th>부여 칸수</th>
+          <th>관리</th>
+        </tr>
+      </thead>
+      <tbody id="criteriaBody">
+        <!-- JS 로 동적 생성 -->
+      </tbody>
+    </table>
+    <button class="btn-secondary" onclick="addCriteriaRow()">+ 기준 추가</button>
 
-            <hr class="divider">
+    <br><br>
 
-            <h3>👥 참가자 관리</h3>
-            <div class="input-group">
-                <input type="text" id="nameInput" placeholder="닉네임">
-                <input type="number" id="weightInput" min="1" placeholder="칸수">
-                <button class="btn-add" onclick="addParticipant()">추가</button>
-            </div>
-
-            <ul id="participantList"></ul>
-        </div>
-
-        <div class="panel panel-game">
-            <h1 id="mainTitle">🍀행운의 룰렛🍀</h1>
-            <div id="resultModal"></div> 
-            
-            <div class="wheel-container">
-                <div class="arrow"></div>
-                <canvas id="wheelCanvas" width="500" height="500"></canvas>
-            </div>
-
-            <div class="control-buttons">
-                <button class="btn-large btn-shuffle" onclick="shuffleParticipants()" id="btnShuffle">섞기</button>
-                <button class="btn-large btn-start" onclick="startSpin()" id="btnStart">시작</button>
-                <button class="btn-large btn-stop" onclick="stopSpin()" id="btnStop" disabled>중지</button>
-            </div>
-        </div>
-
+    <!-- 2. 참여자 추가 -->
+    <h2>2. 참여자 하트 입력</h2>
+    <div class="input-group">
+      <input type="text" id="userName" placeholder="닉네임">
+      <input type="number" id="userHearts" placeholder="하트 수 (예: 55725)">
+      <button class="btn-primary" onclick="addParticipant()">참여자 등록</button>
     </div>
 
-    <script>
-        const canvas = document.getElementById('wheelCanvas');
-        const ctx = canvas.getContext('2d');
-        const participantList = document.getElementById('participantList');
-        const btnStart = document.getElementById('btnStart');
-        const btnStop = document.getElementById('btnStop');
-        const btnShuffle = document.getElementById('btnShuffle');
-        const resultDiv = document.getElementById('resultModal');
-        const mainTitle = document.getElementById('mainTitle');
+    <!-- 3. 참여자 목록 및 조정 -->
+    <h2>3. 참여자 명단 및 칸수 조정 (+/-)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>순위</th>
+          <th>닉네임</th>
+          <th>하트수</th>
+          <th>자동계산</th>
+          <th>조정</th>
+          <th>최종 칸수</th>
+          <th>삭제</th>
+        </tr>
+      </thead>
+      <tbody id="userBody">
+        <!-- JS 로 동적 생성 -->
+      </tbody>
+    </table>
+  </div>
 
-        // 초기 데이터 (비워둠)
-        let participants = [];        // 목록용 (순서 유지)
-        let wheelParticipants = [];   // 룰렛용 (섞임 가능)
+  <!-- 우측 룰렛 패널 -->
+  <div class="panel right-panel">
+    <h2>기념일 룰렛</h2>
+    <div class="wheel-container">
+      <div class="wheel-pointer"></div>
+      <canvas id="wheelCanvas" width="450" height="450"></canvas>
+    </div>
+    <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN !</button>
+    <div class="result-box" id="resultText"></div>
+  </div>
+</div>
 
-        const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#8AC926', '#1982C4'];
+<script>
+  // 1. 초기 기준 데이터 (엑셀 이미지 기준)
+  let criteriaList = [
+    { heart: 12722, slot: 150 },
+    { heart: 5252, slot: 75 },
+    { heart: 2723, slot: 35 },
+    { heart: 1722, slot: 15 },
+    { heart: 486, slot: 5 },
+    { heart: 282, slot: 3 },
+    { heart: 172, slot: 2 },
+    { heart: 100, slot: 1 }
+  ];
 
-        let currentRotation = 0;   
-        let currentSpeed = 0;      
-        let isSpinning = false;    
-        let isStopping = false;    
-        let animationId = null;    
+  // 2. 참여자 데이터 구조 [{ id, name, hearts, adjSlots }]
+  let participants = [];
 
-        // 룰렛 그리기 (wheelParticipants 사용)
-        function drawWheel() {
-            const totalWeight = wheelParticipants.reduce((sum, p) => sum + p.weight, 0);
-            let currentAngle = (currentRotation * Math.PI) / 180; 
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = canvas.width / 2;
+  // 색상 팔레트
+  const colors = ['#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71', '#e67e22', '#34495e'];
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // 초기화 함수
+  window.onload = function() {
+    renderCriteria();
+    renderUsers();
+    drawWheel();
+  };
 
-            if (wheelParticipants.length === 0) {
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-                ctx.fillStyle = '#f5f5f5';
-                ctx.fill();
-                resultDiv.innerText = ""; 
-                return;
-            }
+  // --- [기준 테이블 관련 기능] ---
+  function renderCriteria() {
+    // 내림차순 정렬 (높은 하트 기준부터 계산하기 위함)
+    criteriaList.sort((a, b) => b.heart - a.heart);
+    
+    const tbody = document.getElementById('criteriaBody');
+    tbody.innerHTML = '';
+    
+    criteriaList.forEach((item, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="number" value="${item.heart}" onchange="updateCriteria(${index}, 'heart', this.value)"></td>
+        <td><input type="number" value="${item.slot}" onchange="updateCriteria(${index}, 'slot', this.value)"></td>
+        <td><button class="btn-danger" onclick="deleteCriteria(${index})">삭제</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 
-            wheelParticipants.forEach((p, index) => {
-                const sliceAngle = (p.weight / totalWeight) * 2 * Math.PI;
-                
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                const startAngle = currentAngle - (Math.PI / 2); 
-                const endAngle = startAngle + sliceAngle;
-                
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = colors[index % colors.length];
-                ctx.fill();
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = "#ffffff";
-                ctx.stroke();
+  function addCriteriaRow() {
+    criteriaList.push({ heart: 1000, slot: 10 });
+    renderCriteria();
+    recalculateAllUsers();
+  }
 
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(startAngle + sliceAngle / 2);
-                ctx.textAlign = "right";
-                ctx.fillStyle = "#fff";
-                ctx.font = "bold 24px Arial";
-                ctx.shadowColor = "rgba(0,0,0,0.5)";
-                ctx.shadowBlur = 4;
-                ctx.fillText(p.name, radius - 30, 8);
-                ctx.restore();
+  function updateCriteria(index, key, value) {
+    criteriaList[index][key] = Number(value) || 0;
+    renderCriteria();
+    recalculateAllUsers();
+  }
 
-                currentAngle += sliceAngle;
-            });
-            
-            // 그리기 완료 후 항상 현재 당첨자 표시 업데이트 (섞기 후에도 반영됨)
-            updateCurrentWinnerDisplay();
-        }
+  function deleteCriteria(index) {
+    criteriaList.splice(index, 1);
+    renderCriteria();
+    recalculateAllUsers();
+  }
 
-        // 목록 업데이트 (participants 사용 - 목록 순서 유지)
-        function updateList() {
-            participantList.innerHTML = '';
-            participants.forEach((p, index) => {
-                const li = document.createElement('li');
-                
-                li.innerHTML = `
-                    <span class="name-text">${index + 1}. ${p.name}</span>
-                    <div class="list-controls">
-                        <input type="number" 
-                               class="weight-edit" 
-                               value="${p.weight}" 
-                               min="1" 
-                               oninput="updateWeight(${index}, this.value)" 
-                               ${isSpinning ? 'disabled' : ''}>
-                        <button class="btn-delete" onclick="removeParticipant(${index})">삭제</button>
-                    </div>
-                `;
-                participantList.appendChild(li);
-            });
-        }
+  // --- [하트 기반 칸수 자동 계산 로직 (Greedy)] ---
+  function calculateAutoSlots(hearts) {
+    let remaining = hearts;
+    let totalSlots = 0;
 
-        // 무게 업데이트
-        function updateWeight(index, value) {
-            if (isSpinning) return;
-            const newWeight = parseInt(value);
-            if (!isNaN(newWeight) && newWeight > 0) {
-                participants[index].weight = newWeight;
-                drawWheel();
-            }
-        }
+    for (let c of criteriaList) {
+      if (c.heart <= 0) continue;
+      const count = Math.floor(remaining / c.heart);
+      if (count > 0) {
+        totalSlots += count * c.slot;
+        remaining %= c.heart;
+      }
+    }
+    return totalSlots;
+  }
 
-        // 참가자 추가
-        function addParticipant() {
-            const nameInput = document.getElementById('nameInput');
-            const weightInput = document.getElementById('weightInput');
-            const name = nameInput.value.trim();
-            const weight = parseInt(weightInput.value);
+  function recalculateAllUsers() {
+    renderUsers();
+    drawWheel();
+  }
 
-            if (name && weight > 0) {
-                participants.push({ name, weight });
-                // 추가 시 룰렛 데이터 동기화
-                wheelParticipants = [...participants];
-                
-                nameInput.value = '';
-                weightInput.value = '1';
-                
-                drawWheel();
-                updateList();
-                
-                participantList.scrollTop = participantList.scrollHeight;
-                nameInput.focus();
-            } else {
-                alert('이름과 1 이상의 칸수를 입력해주세요.');
-            }
-        }
+  // --- [참여자 관리 기능] ---
+  function addParticipant() {
+    const nameInput = document.getElementById('userName');
+    const heartsInput = document.getElementById('userHearts');
 
-        // 참가자 삭제
-        function removeParticipant(index) {
-            if (isSpinning) return;
-            participants.splice(index, 1);
-            // 삭제 시 룰렛 데이터 동기화
-            wheelParticipants = [...participants];
-            
-            drawWheel();
-            updateList();
-        }
+    const name = nameInput.value.trim();
+    const hearts = Number(heartsInput.value) || 0;
 
-        // 제목 변경
-        function updateTitle() {
-            const titleInput = document.getElementById('titleInput');
-            const newTitle = titleInput.value.trim();
-            if (newTitle) {
-                mainTitle.innerText = newTitle;
-            } else {
-                alert("제목을 입력해주세요.");
-            }
-        }
+    if (!name) { alert('닉네임을 입력해 주세요.'); return; }
 
-        // 순서 섞기 (wheelParticipants만 섞음)
-        function shuffleParticipants() {
-            if (isSpinning) {
-                alert("룰렛이 도는 중에는 섞을 수 없습니다.");
-                return;
-            }
-            // wheelParticipants만 섞어서 룰렛에 반영
-            for (let i = wheelParticipants.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [wheelParticipants[i], wheelParticipants[j]] = [wheelParticipants[j], wheelParticipants[i]];
-            }
-            drawWheel(); 
-            // [참고] drawWheel 내부에서 updateCurrentWinnerDisplay()가 호출되어 이름이 즉시 갱신됨
-        }
+    participants.push({
+      id: Date.now(),
+      name: name,
+      hearts: hearts,
+      adjSlots: 0 // 최초 조정값 0
+    });
 
-function animate() {
-            if (!isSpinning) return;
+    nameInput.value = '';
+    heartsInput.value = '';
 
-            if (isStopping) {
-                // 속도에 0.99을 계속 곱해서 서서히 줄어들게 함
-                // (숫자를 0.99로 하면 더 천천히, 0.90으로 하면 더 빨리 멈춤)
-                currentSpeed = currentSpeed * 0.99;
+    renderUsers();
+    drawWheel();
+  }
 
-                // 속도가 아주 느려지면(0.01 미만) 완전히 정지
-                if (currentSpeed < 0.01) {
-                    isSpinning = false;
-                    isStopping = false;
-                    currentSpeed = 0;
-                    calculateWinner(); 
-                    
-                    // 버튼 상태 복구
-                    btnStart.disabled = false;
-                    btnShuffle.disabled = false;
-                    btnStop.disabled = true;
-                    
-                    updateList();
-                    return;
-                }
-            }
+  function adjustSlot(index, delta) {
+    participants[index].adjSlots += delta;
+    renderUsers();
+    drawWheel();
+  }
 
-            currentRotation += currentSpeed;
-            if (currentRotation >= 360) currentRotation -= 360; 
+  function deleteParticipant(index) {
+    participants.splice(index, 1);
+    renderUsers();
+    drawWheel();
+  }
 
-            drawWheel(); 
-            animationId = requestAnimationFrame(animate);
-        }
+  function renderUsers() {
+    // 하트 높은 순으로 순위 정렬
+    participants.sort((a, b) => b.hearts - a.hearts);
 
-        // 현재 당첨자 표시 (wheelParticipants 사용)
-        function updateCurrentWinnerDisplay() {
-            if (wheelParticipants.length === 0) return;
+    const tbody = document.getElementById('userBody');
+    tbody.innerHTML = '';
 
-            const totalWeight = wheelParticipants.reduce((sum, p) => sum + p.weight, 0);
-            // 룰렛은 시계방향 회전하므로 360 - 회전각
-            const pointerAngle = (360 - currentRotation % 360) % 360;
-            
-            let currentAngle = 0;
-            let currentTarget = null;
+    participants.forEach((p, index) => {
+      const autoSlots = calculateAutoSlots(p.hearts);
+      const finalSlots = Math.max(0, autoSlots + p.adjSlots);
+      
+      // 사용자 객체에 최종 칸수 저장
+      p.finalSlots = finalSlots;
 
-            for (let p of wheelParticipants) {
-                const sliceAngleDeg = (p.weight / totalWeight) * 360;
-                if (pointerAngle >= currentAngle && pointerAngle < currentAngle + sliceAngleDeg) {
-                    currentTarget = p.name;
-                    break;
-                }
-                currentAngle += sliceAngleDeg;
-            }
-            
-            // 도는 중이거나, 멈췄지만 결과창이 비어있거나 섞기 후 갱신이 필요할 때
-            // 단순히 현재 가리키는 대상을 표시
-            if (isSpinning) {
-                resultDiv.innerText = currentTarget;
-            } else if (wheelParticipants.length > 0) {
-                 // 섞기 버튼 클릭 등으로 룰렛 배치가 바뀌었을 때도 바로 반영
-                 // 단, '축하합니다' 메시지가 떠있는 상태라면 덮어쓰지 않도록 조건 추가 가능하나
-                 // 현재 요구사항(현행화)에 맞춰 항상 현재 위치 이름으로 갱신
-                 
-                 // 만약 "축하 메시지"를 유지하고 싶다면 아래 조건 추가:
-                 // if (!resultDiv.innerText.includes("🎉")) resultDiv.innerText = currentTarget;
-                 
-                 // 여기서는 즉시 현행화 (축하메시지도 섞으면 사라지고 현재 위치 이름 뜸)
-                 resultDiv.innerText = currentTarget;
-            }
-        }
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td><strong>${p.name}</strong></td>
+        <td>${p.hearts.toLocaleString()}</td>
+        <td>${autoSlots}칸</td>
+        <td>
+          <button class="adj-btn btn-minus" onclick="adjustSlot(${index}, -1)">-</button>
+          <button class="adj-btn btn-plus" onclick="adjustSlot(${index}, 1)">+</button>
+        </td>
+        <td style="color:#ffcc00; font-weight:bold;">${finalSlots}칸 (${p.adjSlots >= 0 ? '+' : ''}${p.adjSlots})</td>
+        <td><button class="btn-danger" onclick="deleteParticipant(${index})">삭제</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 
-        function startSpin() {
-            if (participants.length === 0) {
-                alert('참가자를 추가해주세요!');
-                return;
-            }
-            if (isSpinning) return;
+  // --- [룰렛 그려주기 & 회전 제어 (Canvas)] ---
+  const canvas = document.getElementById('wheelCanvas');
+  const ctx = canvas.getContext('2d');
+  let currentAngle = 0;
+  let isSpinning = false;
 
-            isSpinning = true;
-            isStopping = false;
-            currentSpeed = 100; 
-            
-            btnStart.disabled = true;
-            btnShuffle.disabled = true;
-            btnStop.disabled = false;
-            
-            updateList();
-            animate();
-        }
+  function drawWheel() {
+    const totalSlotsSum = participants.reduce((sum, p) => sum + (p.finalSlots || 0), 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        function stopSpin() {
-            if (!isSpinning || isStopping) return;
-            isStopping = true;
-        }
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = centerX - 10;
 
-        // 최종 당첨자 계산 (wheelParticipants 사용)
-        function calculateWinner() {
-            const totalWeight = wheelParticipants.reduce((sum, p) => sum + p.weight, 0);
-            const pointerAngle = (360 - currentRotation % 360) % 360;
-            
-            let currentAngle = 0;
-            let winner = null;
+    if (participants.length === 0 || totalSlotsSum === 0) {
+      // 참여자가 없거나 총 칸수가 0일 때
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#33354a';
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('참여자를 추가해주세요', centerX, centerY);
+      return;
+    }
 
-            for (let p of wheelParticipants) {
-                const sliceAngleDeg = (p.weight / totalWeight) * 360;
-                if (pointerAngle >= currentAngle && pointerAngle < currentAngle + sliceAngleDeg) {
-                    winner = p.name;
-                    break;
-                }
-                currentAngle += sliceAngleDeg;
-            }
-            resultDiv.innerText = `🎉${winner}🎉`;
-        }
+    let startAngle = currentAngle;
 
-        document.getElementById('nameInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') addParticipant();
-        });
-        
-        document.getElementById('titleInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') updateTitle();
-        });
+    participants.forEach((p, i) => {
+      if (p.finalSlots <= 0) return;
 
-        // 초기 실행
-        drawWheel();
-        updateList(); 
+      const sliceAngle = (p.finalSlots / totalSlotsSum) * (Math.PI * 2);
+      const endAngle = startAngle + sliceAngle;
 
-    </script>
+      // 부채꼴 그리기
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+      ctx.closePath();
+
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fill();
+      ctx.strokeStyle = '#252636';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // 텍스트 출력
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(startAngle + sliceAngle / 2);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px sans-serif';
+      
+      // 부채꼴 크기에 맞게 닉네임 + 칸수 표기
+      if (sliceAngle > 0.08) {
+        ctx.fillText(`${p.name} (${p.finalSlots}칸)`, radius - 20, 5);
+      }
+      ctx.restore();
+
+      startAngle = endAngle;
+    });
+  }
+
+  function spinWheel() {
+    const totalSlotsSum = participants.reduce((sum, p) => sum + (p.finalSlots || 0), 0);
+    if (isSpinning || totalSlotsSum === 0) return;
+
+    isSpinning = true;
+    document.getElementById('spinBtn').disabled = true;
+    document.getElementById('resultText').innerText = '추첨 중...';
+
+    // 랜덤 회전 바퀴 수 (5바퀴 ~ 10바퀴 + 알파)
+    const rotateAngle = Math.floor(Math.random() * 360) + 1800; 
+    const duration = 5000; // 회전 시간 (5초)
+    const startTimestamp = performance.now();
+    const initialAngle = currentAngle;
+
+    function animate(now) {
+      const elapsed = now - startTimestamp;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing 함수 (감속 효과)
+      const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+      
+      const currentRotate = (rotateAngle * Math.PI / 180) * easeOut(progress);
+      currentAngle = initialAngle + currentRotate;
+
+      drawWheel();
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        isSpinning = false;
+        document.getElementById('spinBtn').disabled = false;
+        calculateWinner();
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  function calculateWinner() {
+    const totalSlotsSum = participants.reduce((sum, p) => sum + (p.finalSlots || 0), 0);
+    
+    // 현재 포인터 위치(12시 방향 = -Math.PI / 2)에 해당하는 각도 계산
+    let normalizedAngle = (Math.PI * 2 - (currentAngle % (Math.PI * 2)) - Math.PI / 2) % (Math.PI * 2);
+    if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
+
+    let currentSumAngle = 0;
+    let winner = null;
+
+    for (let p of participants) {
+      if (p.finalSlots <= 0) continue;
+      const sliceAngle = (p.finalSlots / totalSlotsSum) * (Math.PI * 2);
+      if (normalizedAngle >= currentSumAngle && normalizedAngle < currentSumAngle + sliceAngle) {
+        winner = p;
+        break;
+      }
+      currentSumAngle += sliceAngle;
+    }
+
+    if (winner) {
+      document.getElementById('resultText').innerText = `🎉 당첨자: [ ${winner.name} ] 🎉`;
+    }
+  }
+</script>
+
 </body>
-
 </html>
-
-
-
