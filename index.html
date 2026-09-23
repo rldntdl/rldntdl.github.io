@@ -439,8 +439,8 @@
     overlay.style.display = 'none';
 
     // Random minimum rotation + extra random degrees
-    const rotateAngle = Math.floor(Math.random() * 360) + 1800; // ~5+ spins
-    const duration = 5000; // 5 seconds
+    const rotateAngle = Math.floor(Math.random() * 360) + 2500; // ~5+ spins
+    const duration = =000; // 5 seconds
     const startTimestamp = performance.now();
     const initialAngle = currentAngle;
 
@@ -449,7 +449,7 @@
       const progress = Math.min(elapsed / duration, 1);
       
       // Easing function: easeOutCubic (slows down cleanly at the end)
-      const easeOut = (t) => 1 - Math.pow(1 - t, 4);
+      const easeOut = (t) => 1 - Math.pow(1 - t, 5);
       
       const currentRotate = (rotateAngle * Math.PI / 180) * easeOut(progress);
       currentAngle = initialAngle + currentRotate;
