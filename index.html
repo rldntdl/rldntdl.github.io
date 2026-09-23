@@ -11,15 +11,19 @@
     .container { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; flex-wrap: wrap; }
     .panel { background: #252636; border-radius: 12px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
     .left-panel { flex: 1.2; min-width: 550px; }
-    .right-panel { flex: 0.8; min-width: 400px; display: flex; flex-direction: column; align-items: center; }
+    .right-panel { flex: 0.8; min-width: 450px; display: flex; flex-direction: column; align-items: center; }
 
-    h2 { font-size: 1.2rem; color: #ff3366; margin-bottom: 15px; border-bottom: 2px solid #33354a; padding-bottom: 8px; }
+    h2 { font-size: 1.2rem; color: #ff3366; margin-bottom: 15px; border-bottom: 2px solid #33354a; padding-bottom: 8px; margin-top: 25px; }
+    h2:first-child { margin-top: 0; }
+    
+    /* Roulette Main Title */
+    #rouletteTitleDisplay { font-size: 2rem; color: #ffcc00; border: none; margin-bottom: 20px; margin-top: 0; }
 
     /* Tables */
     table { width: 100%; border-collapse: collapse; margin-bottom: 15px; text-align: center; font-size: 0.9rem; }
     th, td { border: 1px solid #3d3f58; padding: 8px 6px; }
     th { background-color: #2e3047; color: #ffcc00; }
-    td input[type="number"], td input[type="text"] {
+    td input[type="number"] {
       width: 90%; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; text-align: center; border-radius: 4px; padding: 4px;
     }
 
@@ -28,11 +32,9 @@
     .input-group input { flex: 1; padding: 10px; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; border-radius: 6px; }
     
     button { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: 0.2s; }
-    .btn-primary { background: #ff3366; color: #fff; padding: 10px 15px; }
+    .btn-primary { background: #ff3366; color: #fff; padding: 10px 20px; }
     .btn-primary:hover { background: #e02e5a; }
-    .btn-secondary { background: #4a4d6d; color: #fff; padding: 6px 12px; }
-    .btn-secondary:hover { background: #5c6087; }
-    .btn-danger { background: #e74c3c; color: #fff; padding: 4px 8px; }
+    .btn-danger { background: #e74c3c; color: #fff; padding: 4px 12px; }
 
     /* +/- Buttons */
     .adj-btn { width: 26px; height: 26px; border-radius: 50%; font-size: 14px; margin: 0 2px; }
@@ -40,30 +42,59 @@
     .btn-minus { background: #e67e22; color: #fff; }
 
     /* Wheel Area */
-    .wheel-container { position: relative; margin: 20px 0; }
+    .wheel-container { position: relative; margin: 10px 0; width: 450px; height: 450px; }
     .wheel-pointer {
       position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
       width: 0; height: 0;
-      border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #ff3366;
+      border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #ffcc00;
       z-index: 10;
     }
-    canvas { border-radius: 50%; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+    canvas { border-radius: 50%; box-shadow: 0 0 25px rgba(0,0,0,0.6); }
 
-    .spin-btn { background: #ff3366; color: #fff; font-size: 1.3rem; padding: 15px 40px; border-radius: 30px; margin-top: 10px; width: 100%; max-width: 300px; box-shadow: 0 4px 15px rgba(255,51,102,0.4); }
-    .spin-btn:hover { background: #ff4d79; transform: scale(1.03); }
-    .spin-btn:disabled { background: #555; cursor: not-allowed; transform: none; }
+    /* Semi-transparent White Letterbox Overlay */
+    .winner-overlay {
+      position: absolute;
+      top: 50%; left: 0; width: 100%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      color: #1a1a24;
+      font-size: 2.2rem;
+      font-weight: 900;
+      text-align: center;
+      padding: 25px 0;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+      display: none;
+      z-index: 20;
+      pointer-events: none;
+    }
 
-    .result-box { margin-top: 15px; font-size: 1.4rem; font-weight: bold; color: #ffcc00; text-align: center; height: 35px; }
+    /* Action Buttons (Shuffle + Spin) */
+    .action-buttons { display: flex; gap: 15px; width: 100%; max-width: 450px; margin-top: 20px; }
+    .shuffle-btn { flex: 0.3; background: #4a4d6d; color: #fff; font-size: 1.1rem; border-radius: 30px; }
+    .shuffle-btn:hover { background: #5c6087; }
+    .spin-btn { flex: 0.7; background: #ff3366; color: #fff; font-size: 1.3rem; padding: 15px; border-radius: 30px; box-shadow: 0 4px 15px rgba(255,51,102,0.4); }
+    .spin-btn:hover { background: #ff4d79; transform: scale(1.02); }
+    .spin-btn:disabled { background: #555; cursor: not-allowed; transform: none; box-shadow: none; }
   </style>
 </head>
 <body>
-
 <div class="container">
-  <!-- 좌측 관리 패널 -->
+  <!-- Left Panel for Controls -->
   <div class="panel left-panel">
     
-    <!-- 1. 하트 / 칸수 기준 설정 -->
+    <!-- 0. Title Settings -->
+    <h2>0. 룰렛 제목 설정</h2>
+    <div class="input-group">
+      <input type="text" id="titleInput" placeholder="룰렛 제목을 입력하세요" value="기념일 룰렛" oninput="updateTitle()">
+    </div>
+
+    <!-- 1. Criteria Settings -->
     <h2>1. 하트/칸수 자동 계산 기준 설정</h2>
+    <div class="input-group">
+      <input type="number" id="newHeart" placeholder="하트 (예: 12486)">
+      <input type="number" id="newSlot" placeholder="칸수 (예: 200)">
+      <button class="btn-primary" onclick="addCriteria()">적용</button>
+    </div>
     <table id="criteriaTable">
       <thead>
         <tr>
@@ -73,14 +104,11 @@
         </tr>
       </thead>
       <tbody id="criteriaBody">
-        <!-- JS 로 동적 생성 -->
+        <tr><td colspan="3" style="color: #888;">기준을 입력하고 적용을 눌러주세요.</td></tr>
       </tbody>
     </table>
-    <button class="btn-secondary" onclick="addCriteriaRow()">+ 기준 추가</button>
 
-    <br><br>
-
-    <!-- 2. 참여자 추가 -->
+    <!-- 2. Participant Input -->
     <h2>2. 참여자 하트 입력</h2>
     <div class="input-group">
       <input type="text" id="userName" placeholder="닉네임">
@@ -88,7 +116,7 @@
       <button class="btn-primary" onclick="addParticipant()">참여자 등록</button>
     </div>
 
-    <!-- 3. 참여자 목록 및 조정 -->
+    <!-- 3. Participant List & Adjustment -->
     <h2>3. 참여자 명단 및 칸수 조정 (+/-)</h2>
     <table>
       <thead>
@@ -103,78 +131,89 @@
         </tr>
       </thead>
       <tbody id="userBody">
-        <!-- JS 로 동적 생성 -->
+        <!-- JS dynamically generates content here -->
       </tbody>
     </table>
   </div>
 
-  <!-- 우측 룰렛 패널 -->
+  <!-- Right Panel for Roulette -->
   <div class="panel right-panel">
-    <h2>기념일 룰렛</h2>
+    <h2 id="rouletteTitleDisplay">기념일 룰렛</h2>
+    
     <div class="wheel-container">
       <div class="wheel-pointer"></div>
       <canvas id="wheelCanvas" width="450" height="450"></canvas>
+      <div class="winner-overlay" id="winnerOverlay">🎉 당첨자 🎉</div>
     </div>
-    <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN !</button>
-    <div class="result-box" id="resultText"></div>
+    
+    <div class="action-buttons">
+      <button class="shuffle-btn" onclick="shuffleWheel()">섞기</button>
+      <button class="spin-btn" id="spinBtn" onclick="spinWheel()">시작</button>
+    </div>
   </div>
 </div>
 
 <script>
-  // 1. 초기 기준 데이터 (엑셀 이미지 기준)
-  let criteriaList = [
-    { heart: 12722, slot: 150 },
-    { heart: 5252, slot: 75 },
-    { heart: 2723, slot: 35 },
-    { heart: 1722, slot: 15 },
-    { heart: 486, slot: 5 },
-    { heart: 282, slot: 3 },
-    { heart: 172, slot: 2 },
-    { heart: 100, slot: 1 }
-  ];
-
-  // 2. 참여자 데이터 구조 [{ id, name, hearts, adjSlots }]
-  let participants = [];
-
-  // 색상 팔레트
+  // --- [State Variables] ---
+  let criteriaList = []; 
+  // participants array strictly sorted by Hearts
+  let participants = []; // { id, name, hearts, adjSlots, finalSlots }
+  // wheelOrderIds stores only IDs to define the visual order on the wheel independently
+  let wheelOrderIds = []; 
+  
   const colors = ['#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71', '#e67e22', '#34495e'];
 
-  // 초기화 함수
   window.onload = function() {
     renderCriteria();
     renderUsers();
     drawWheel();
   };
 
-  // --- [기준 테이블 관련 기능] ---
+  // --- [0. Title Setting] ---
+  function updateTitle() {
+    const titleText = document.getElementById('titleInput').value || '기념일 룰렛';
+    document.getElementById('rouletteTitleDisplay').innerText = titleText;
+  }
+
+  // --- [1. Criteria Table Logic] ---
+  function addCriteria() {
+    const heartInput = document.getElementById('newHeart');
+    const slotInput = document.getElementById('newSlot');
+    const h = Number(heartInput.value);
+    const s = Number(slotInput.value);
+
+    if (h > 0 && s > 0) {
+      criteriaList.push({ heart: h, slot: s });
+      heartInput.value = '';
+      slotInput.value = '';
+      renderCriteria();
+      recalculateAllUsers();
+    } else {
+      alert('올바른 하트와 칸수를 입력하세요.');
+    }
+  }
+
   function renderCriteria() {
-    // 내림차순 정렬 (높은 하트 기준부터 계산하기 위함)
+    // Sort descending by Hearts
     criteriaList.sort((a, b) => b.heart - a.heart);
     
     const tbody = document.getElementById('criteriaBody');
     tbody.innerHTML = '';
     
+    if (criteriaList.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" style="color: #888;">기준을 입력하고 적용을 눌러주세요.</td></tr>`;
+      return;
+    }
+
     criteriaList.forEach((item, index) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><input type="number" value="${item.heart}" onchange="updateCriteria(${index}, 'heart', this.value)"></td>
-        <td><input type="number" value="${item.slot}" onchange="updateCriteria(${index}, 'slot', this.value)"></td>
+        <td>${item.heart.toLocaleString()}</td>
+        <td>${item.slot.toLocaleString()}</td>
         <td><button class="btn-danger" onclick="deleteCriteria(${index})">삭제</button></td>
       `;
       tbody.appendChild(tr);
     });
-  }
-
-  function addCriteriaRow() {
-    criteriaList.push({ heart: 1000, slot: 10 });
-    renderCriteria();
-    recalculateAllUsers();
-  }
-
-  function updateCriteria(index, key, value) {
-    criteriaList[index][key] = Number(value) || 0;
-    renderCriteria();
-    recalculateAllUsers();
   }
 
   function deleteCriteria(index) {
@@ -183,7 +222,7 @@
     recalculateAllUsers();
   }
 
-  // --- [하트 기반 칸수 자동 계산 로직 (Greedy)] ---
+  // --- [Auto Calculate Logic (Greedy)] ---
   function calculateAutoSlots(hearts) {
     let remaining = hearts;
     let totalSlots = 0;
@@ -204,7 +243,7 @@
     drawWheel();
   }
 
-  // --- [참여자 관리 기능] ---
+  // --- [2, 3. Participant Management] ---
   function addParticipant() {
     const nameInput = document.getElementById('userName');
     const heartsInput = document.getElementById('userHearts');
@@ -214,12 +253,17 @@
 
     if (!name) { alert('닉네임을 입력해 주세요.'); return; }
 
+    const newId = Date.now();
     participants.push({
-      id: Date.now(),
+      id: newId,
       name: name,
       hearts: hearts,
-      adjSlots: 0 // 최초 조정값 0
+      adjSlots: 0,
+      finalSlots: 0
     });
+    
+    // Add new participant to the wheel order array
+    wheelOrderIds.push(newId);
 
     nameInput.value = '';
     heartsInput.value = '';
@@ -228,54 +272,71 @@
     drawWheel();
   }
 
-  function adjustSlot(index, delta) {
-    participants[index].adjSlots += delta;
-    renderUsers();
-    drawWheel();
+  function adjustSlot(id, delta) {
+    const p = participants.find(part => part.id === id);
+    if (p) {
+      p.adjSlots += delta;
+      renderUsers();
+      drawWheel();
+    }
   }
 
-  function deleteParticipant(index) {
-    participants.splice(index, 1);
+  function deleteParticipant(id) {
+    participants = participants.filter(part => part.id !== id);
+    wheelOrderIds = wheelOrderIds.filter(wheelId => wheelId !== id);
     renderUsers();
     drawWheel();
   }
 
   function renderUsers() {
-    // 하트 높은 순으로 순위 정렬
-    participants.sort((a, b) => b.hearts - a.hearts);
-
     const tbody = document.getElementById('userBody');
     tbody.innerHTML = '';
+
+    // Always sort the TABLE by hearts descending
+    participants.sort((a, b) => b.hearts - a.hearts);
 
     participants.forEach((p, index) => {
       const autoSlots = calculateAutoSlots(p.hearts);
       const finalSlots = Math.max(0, autoSlots + p.adjSlots);
-      
-      // 사용자 객체에 최종 칸수 저장
-      p.finalSlots = finalSlots;
+      p.finalSlots = finalSlots; // Save final slots
+
+      const rank = index + 1;
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${index + 1}</td>
+        <td>${rank}</td>
         <td><strong>${p.name}</strong></td>
         <td>${p.hearts.toLocaleString()}</td>
         <td>${autoSlots}칸</td>
         <td>
-          <button class="adj-btn btn-minus" onclick="adjustSlot(${index}, -1)">-</button>
-          <button class="adj-btn btn-plus" onclick="adjustSlot(${index}, 1)">+</button>
+          <button class="adj-btn btn-minus" onclick="adjustSlot(${p.id}, -1)">-</button>
+          <button class="adj-btn btn-plus" onclick="adjustSlot(${p.id}, 1)">+</button>
         </td>
         <td style="color:#ffcc00; font-weight:bold;">${finalSlots}칸 (${p.adjSlots >= 0 ? '+' : ''}${p.adjSlots})</td>
-        <td><button class="btn-danger" onclick="deleteParticipant(${index})">삭제</button></td>
+        <td><button class="btn-danger" onclick="deleteParticipant(${p.id})">삭제</button></td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  // --- [룰렛 그려주기 & 회전 제어 (Canvas)] ---
+  // --- [4. Wheel Rendering & Animation] ---
   const canvas = document.getElementById('wheelCanvas');
   const ctx = canvas.getContext('2d');
   let currentAngle = 0;
   let isSpinning = false;
+
+  // Shuffle ONLY the wheel segments, not the left table
+  function shuffleWheel() {
+    if (wheelOrderIds.length === 0) return;
+    
+    // Fisher-Yates Shuffle on wheel order IDs
+    for (let i = wheelOrderIds.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [wheelOrderIds[i], wheelOrderIds[j]] = [wheelOrderIds[j], wheelOrderIds[i]];
+    }
+    
+    drawWheel();
+  }
 
   function drawWheel() {
     const totalSlotsSum = participants.reduce((sum, p) => sum + (p.finalSlots || 0), 0);
@@ -286,13 +347,12 @@
     const radius = centerX - 10;
 
     if (participants.length === 0 || totalSlotsSum === 0) {
-      // 참여자가 없거나 총 칸수가 0일 때
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.fillStyle = '#33354a';
       ctx.fill();
       ctx.fillStyle = '#fff';
-      ctx.font = '16px sans-serif';
+      ctx.font = '18px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('참여자를 추가해주세요', centerX, centerY);
       return;
@@ -300,13 +360,15 @@
 
     let startAngle = currentAngle;
 
-    participants.forEach((p, i) => {
-      if (p.finalSlots <= 0) return;
+    // Draw wheel based on the shuffled wheelOrderIds array
+    wheelOrderIds.forEach((id, i) => {
+      const p = participants.find(part => part.id === id);
+      if (!p || p.finalSlots <= 0) return;
 
       const sliceAngle = (p.finalSlots / totalSlotsSum) * (Math.PI * 2);
       const endAngle = startAngle + sliceAngle;
 
-      // 부채꼴 그리기
+      // Draw slice
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
       ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -318,17 +380,17 @@
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // 텍스트 출력
+      // Draw text (Name only)
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate(startAngle + sliceAngle / 2);
       ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
       ctx.fillStyle = '#fff';
-      ctx.font = 'bold 14px sans-serif';
+      ctx.font = 'bold 16px sans-serif';
       
-      // 부채꼴 크기에 맞게 닉네임 + 칸수 표기
-      if (sliceAngle > 0.08) {
-        ctx.fillText(`${p.name} (${p.finalSlots}칸)`, radius - 20, 5);
+      if (sliceAngle > 0.08) { // Skip text if slice is too narrow
+        ctx.fillText(`${p.name}`, radius - 20, 0);
       }
       ctx.restore();
 
@@ -342,11 +404,13 @@
 
     isSpinning = true;
     document.getElementById('spinBtn').disabled = true;
-    document.getElementById('resultText').innerText = '추첨 중...';
+    
+    // Hide overlay when starting spin
+    const overlay = document.getElementById('winnerOverlay');
+    overlay.style.display = 'none';
 
-    // 랜덤 회전 바퀴 수 (5바퀴 ~ 10바퀴 + 알파)
-    const rotateAngle = Math.floor(Math.random() * 360) + 1800; 
-    const duration = 5000; // 회전 시간 (5초)
+    const rotateAngle = Math.floor(Math.random() * 360) + 1800; // Random rotations (min 5)
+    const duration = 5000; // 5 seconds
     const startTimestamp = performance.now();
     const initialAngle = currentAngle;
 
@@ -354,7 +418,7 @@
       const elapsed = now - startTimestamp;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Easing 함수 (감속 효과)
+      // Easing function (easeOutCubic)
       const easeOut = (t) => 1 - Math.pow(1 - t, 3);
       
       const currentRotate = (rotateAngle * Math.PI / 180) * easeOut(progress);
@@ -377,15 +441,18 @@
   function calculateWinner() {
     const totalSlotsSum = participants.reduce((sum, p) => sum + (p.finalSlots || 0), 0);
     
-    // 현재 포인터 위치(12시 방향 = -Math.PI / 2)에 해당하는 각도 계산
+    // Find normalized angle at the top pointer (-Math.PI / 2)
     let normalizedAngle = (Math.PI * 2 - (currentAngle % (Math.PI * 2)) - Math.PI / 2) % (Math.PI * 2);
     if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
 
     let currentSumAngle = 0;
     let winner = null;
 
-    for (let p of participants) {
-      if (p.finalSlots <= 0) continue;
+    // Must calculate winner using the same wheelOrderIds layout
+    for (let id of wheelOrderIds) {
+      const p = participants.find(part => part.id === id);
+      if (!p || p.finalSlots <= 0) continue;
+
       const sliceAngle = (p.finalSlots / totalSlotsSum) * (Math.PI * 2);
       if (normalizedAngle >= currentSumAngle && normalizedAngle < currentSumAngle + sliceAngle) {
         winner = p;
@@ -395,7 +462,9 @@
     }
 
     if (winner) {
-      document.getElementById('resultText').innerText = `🎉 당첨자: [ ${winner.name} ] 🎉`;
+      const overlay = document.getElementById('winnerOverlay');
+      overlay.innerHTML = `🎉 당첨: ${winner.name} 🎉`;
+      overlay.style.display = 'block'; // Show letterbox overlay
     }
   }
 </script>
