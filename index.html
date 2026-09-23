@@ -50,6 +50,7 @@
     }
     canvas { border-radius: 50%; box-shadow: 0 0 25px rgba(0,0,0,0.6); }
 
+    /* 실시간 닉네임 레터박스 */
     .tick-overlay {
       position: absolute;
       top: 50%; left: 0; width: 100%;
@@ -65,6 +66,7 @@
       pointer-events: none;
     }
 
+    /* 최종 당첨자 오버레이 */
     .winner-overlay {
       position: absolute;
       top: 50%; left: 0; width: 100%;
@@ -188,7 +190,7 @@
 
     <h2>3. 참여자 명단 및 칸수 조정</h2>
     <div class="input-group">
-      <!-- ime-mode: active; 를 통해 한글 자판 기본 활성화 -->
+      <!-- ime-mode: active 속성으로 포커스 시 한글 자판 기본 활성화 -->
       <input type="text" id="userName" placeholder="닉네임" style="ime-mode: active;">
       <input type="number" id="userHearts" placeholder="하트 수">
       <button class="btn-primary" onclick="addParticipant()">추가</button>
@@ -434,7 +436,7 @@
   let isSpinning = false;
   let isContinuous = false; 
   let lastFrameTime = 0; 
-  let currentVelocity = 0; 
+  let currentVelocity = 0; // 현재 회전 속도
 
   function shuffleWheel() {
     if (wheelOrderIds.length === 0 || isSpinning) return;
@@ -529,9 +531,12 @@
     if (!isContinuous) return;
     
     if (!lastFrameTime) lastFrameTime = now;
-    const dt = now - lastFrameTime;
+    let dt = now - lastFrameTime;
+    // 탭 비활성화 시 dt가 너무 커져 튕기는 현상 방지(최대 50ms 제한)
+    if (dt > 50) dt = 16;
     lastFrameTime = now;
     
+    // 빠른 무한 회전 속도 유지
     currentVelocity = 0.048; 
     currentAngle += currentVelocity * dt; 
     drawWheel();
@@ -568,27 +573,17 @@
     isContinuous = false; 
     document.getElementById('stopBtn').disabled = true; 
 
-    const startTimestamp = performance.now();
-    const initialAngle = currentAngle; 
-    const initialVelocity = currentVelocity; 
-    
-    // 시간 제한 완전 해제: 물리적 거리(totalRotation)와 초기 속도(initialVelocity)에 의해 온전히 결정됨
-    const extraSpins = Math.floor(Math.random() * 3) + 10; 
-    const totalRotation = (extraSpins * Math.PI * 2) + (Math.random() * Math.PI * 2);
-    
-    // 4차 함수(Quartic ease-out)의 미분 값에 따른 완벽한 정지 시간 동기화 공식
-    const finalDuration = (4 * totalRotation) / initialVelocity; 
-
     function animateStop(now) {
-      const elapsed = now - startTimestamp;
-      let progress = elapsed / finalDuration;
+      if (!lastFrameTime) lastFrameTime = now;
+      let dt = now - lastFrameTime;
+      if (dt > 50) dt = 16;
+      lastFrameTime = now;
       
-      // 진행도가 1(100%)을 넘지 않도록 처리
-      if (progress > 1) progress = 1;
-      
-      // 4차 곡선(Quartic ease-out): 마지막에 속도가 0으로 아주 천천히 수렴함
-      const easeOut = 1 - Math.pow(1 - progress, 4);
-      currentAngle = initialAngle + totalRotation * easeOut;
+      // ✨ 마찰 엔진 로직: 시간 제한 없이 현재 속도에 곱해져 0으로 점진 수렴
+      // 0.9993 마찰계수 사용 시 초기 속도 0.048이 임계값 0.0001로 줄어드는데 약 8.8초 소요 (10초 이내 보장)
+      const friction = Math.pow(0.9993, dt);
+      currentVelocity *= friction;
+      currentAngle += currentVelocity * dt;
 
       drawWheel();
       
@@ -597,7 +592,8 @@
         document.getElementById('tickOverlay').innerText = hovered.name;
       }
 
-      if (progress < 1) {
+      // 속도가 육안으로 멈췄다고 느껴지는 극소수치(0.0001)에 도달할 때까지 감속 지속
+      if (currentVelocity > 0.0001) {
         requestAnimationFrame(animateStop);
       } else {
         isSpinning = false;
