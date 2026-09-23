@@ -214,7 +214,7 @@
   </div>
 
   <div class="panel right-panel">
-    <h2 id="rouletteTitleDisplay">돌려돌려 돌림판🍀</h2>
+    <h2 id="rouletteTitleDisplay">🌀돌려돌려 돌림판🌀</h2>
     
     <div class="wheel-container">
       <div class="wheel-pointer"></div>
@@ -592,8 +592,8 @@
         document.getElementById('tickOverlay').innerText = hovered.name;
       }
 
-      // 속도가 육안으로 멈췄다고 느껴지는 극소수치(0.00002)에 도달할 때까지 감속 지속
-      if (currentVelocity > 0.00002) {
+      // 속도가 육안으로 멈췄다고 느껴지는 극소수치(0.000015)에 도달할 때까지 감속 지속
+      if (currentVelocity > 0.000015) {
         requestAnimationFrame(animateStop);
       } else {
         isSpinning = false;
