@@ -20,7 +20,8 @@
     h2 { font-size: 1.2rem; color: #ff3366; margin-bottom: 15px; border-bottom: 2px solid #33354a; padding-bottom: 8px; margin-top: 25px; }
     h2:first-child { margin-top: 0; }
     
-    #rouletteTitleDisplay { font-size: 2rem; color: #ffcc00; border: none; margin-bottom: 20px; margin-top: 0; text-align: center; }
+    /* 룰렛판 메인 제목 색상을 흰색(#ffffff)으로 수정 */
+    #rouletteTitleDisplay { font-size: 2rem; color: #ffffff; border: none; margin-bottom: 20px; margin-top: 0; text-align: center; }
 
     table { width: 100%; border-collapse: collapse; margin-bottom: 15px; text-align: center; font-size: 0.9rem; }
     th, td { border: 1px solid #3d3f58; padding: 8px 6px; }
@@ -42,10 +43,12 @@
     .btn-minus { background: #e67e22; color: #fff; }
 
     .wheel-container { position: relative; margin: 10px 0; width: 450px; height: 450px; }
+    
+    /* 룰렛 상단 포인터 색상을 버건디(#900020)로 수정 */
     .wheel-pointer {
       position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
       width: 0; height: 0;
-      border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #ffcc00;
+      border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #900020;
       z-index: 10;
     }
     canvas { border-radius: 50%; box-shadow: 0 0 25px rgba(0,0,0,0.6); }
@@ -181,8 +184,8 @@
 <!-- 애드센스 심사 승인 및 사용자 안내를 위한 하단 가이드 영역 -->
 <div class="info-panel">
   <h3>📌 기념일 룰렛 방송 도우미 이용 안내</h3>
-  <p>본 플랫폼은 인터넷 방송 진행 시 기념일 및 시청자 이벤트 방송에서 활용할 수 있는 자동 룰렛 시스템입니다.</p>
-  <p>후원된 하트 개수에 따른 룰렛 칸수(비율) 계산을 효율적으로 보조합니다.</p>
+  <li>본 플랫폼은 인터넷 방송 진행 시 기념일 및 시청자 이벤트 방송에서 활용할 수 있는 자동 룰렛 시스템입니다.</li>
+  <li>후원된 하트 개수에 따른 룰렛 칸수(비율) 계산을 효율적으로 보조합니다.</li>
   
   <h4>✨ 주요 기능 및 사용 방법</h4>
   <ul>
@@ -222,7 +225,7 @@
   }
 
   function updateTitle() {
-    const titleText = document.getElementById('titleInput').value || '기념일 룰렛';
+    const titleText = document.getElementById('titleInput').value || '돌려돌려 돌림판🍀';
     document.getElementById('rouletteTitleDisplay').innerText = titleText;
   }
 
