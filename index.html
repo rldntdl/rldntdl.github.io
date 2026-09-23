@@ -20,7 +20,6 @@
     h2 { font-size: 1.2rem; color: #ff3366; margin-bottom: 15px; border-bottom: 2px solid #33354a; padding-bottom: 8px; margin-top: 25px; }
     h2:first-child { margin-top: 0; }
     
-    /* 룰렛판 메인 제목 색상을 흰색(#ffffff)으로 유지 */
     #rouletteTitleDisplay { font-size: 2rem; color: #ffffff; border: none; margin-bottom: 20px; margin-top: 0; text-align: center; }
 
     table { width: 100%; border-collapse: collapse; margin-bottom: 15px; text-align: center; font-size: 0.9rem; }
@@ -44,7 +43,6 @@
 
     .wheel-container { position: relative; margin: 10px 0; width: 450px; height: 450px; }
     
-    /* 룰렛 상단 포인터 색상을 전체 테마 색상인 핑크(#ff3366)로 통일 */
     .wheel-pointer {
       position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
       width: 0; height: 0;
@@ -103,6 +101,30 @@
     .info-panel h3 { color: #ffcc00; font-size: 1.2rem; margin-bottom: 12px; border-bottom: 1px solid #3d3f58; padding-bottom: 8px; }
     .info-panel h4 { color: #ff3366; font-size: 1.05rem; margin: 15px 0 8px; }
     .info-panel ul { padding-left: 20px; }
+
+    /* 우측 하단 파란색 Buy Me a Coffee 후원 버튼 */
+    .donate-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background-color: #0050FF;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s, background-color 0.2s;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .donate-btn:hover {
+      transform: scale(1.05);
+      background-color: #003fcb;
+    }
   </style>
 </head>
 <body>
@@ -197,6 +219,11 @@
     <li><strong>룰렛판 랜덤 섞기:</strong> '섞기' 버튼 이용 시 참여 명단 순서는 고정된 채 룰렛판의 시각적 위치만 무작위로 재배치됩니다.</li>
   </ul>
 </div>
+
+<!-- 우측 하단 파란색 Buy Me a Coffee 후원 플로팅 버튼 -->
+<a href="https://buymeacoffee.com/rldntdl" target="_blank" class="donate-btn">
+  ☕ 개발자에게 커피 한 잔 후원하기
+</a>
 
 <script>
   let criteriaList = []; 
