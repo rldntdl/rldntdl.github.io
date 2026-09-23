@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>기념일 방송 룰렛 도우미</title>
   
-  <!-- 구글 애드센스 스크립트 -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946635505934816" crossorigin="anonymous"></script>
 
   <style>
@@ -51,7 +50,6 @@
     }
     canvas { border-radius: 50%; box-shadow: 0 0 25px rgba(0,0,0,0.6); }
 
-    /* 반투명 실시간 틱 오버레이 (회전 중 표시되는 레터박스) */
     .tick-overlay {
       position: absolute;
       top: 50%; left: 0; width: 100%;
@@ -67,13 +65,12 @@
       pointer-events: none;
     }
 
-    /* 최종 당첨자 오버레이 (실시간 틱 오버레이와 동일한 다크 테마 적용) */
     .winner-overlay {
       position: absolute;
       top: 50%; left: 0; width: 100%;
       transform: translateY(-50%);
-      background: rgba(0, 0, 0, 0.75); /* 흰색에서 반투명 검은색으로 변경 */
-      color: #fff; /* 글자색을 흰색으로 변경 */
+      background: rgba(0, 0, 0, 0.75); 
+      color: #fff; 
       font-size: 2.2rem;
       font-weight: 900;
       text-align: center;
@@ -88,16 +85,17 @@
 
     .action-buttons { display: flex; gap: 10px; width: 100%; max-width: 450px; margin-top: 20px; }
     
-    .shuffle-btn { flex: 0.2; background: #4a4d6d; color: #fff; font-size: 1.1rem; border-radius: 30px; }
-    .shuffle-btn:hover { background: #5c6087; }
+    .shuffle-btn { flex: 0.2; background: #ffcc00; color: #fff; font-size: 1.3rem; padding: 15px; border-radius: 30px; box-shadow: 0 4px 15px rgba(255,204,0,0.3); }
+    .shuffle-btn:hover { background: #e6b800; transform: scale(1.02); }
+    .shuffle-btn:disabled { background: #555; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
     
     .spin-btn { flex: 0.4; background: #2ecc71; color: #fff; font-size: 1.3rem; padding: 15px; border-radius: 30px; box-shadow: 0 4px 15px rgba(46,204,113,0.4); }
     .spin-btn:hover { background: #27ae60; transform: scale(1.02); }
-    .spin-btn:disabled { background: #555; cursor: not-allowed; transform: none; box-shadow: none; }
+    .spin-btn:disabled { background: #555; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
     
     .stop-btn { flex: 0.4; background: #ff3366; color: #fff; font-size: 1.3rem; padding: 15px; border-radius: 30px; box-shadow: 0 4px 15px rgba(255,51,102,0.4); }
     .stop-btn:hover { background: #ff4d79; transform: scale(1.02); }
-    .stop-btn:disabled { background: #555; cursor: not-allowed; transform: none; box-shadow: none; }
+    .stop-btn:disabled { background: #555; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
 
     #toast-container {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
@@ -219,14 +217,12 @@
     <div class="wheel-container">
       <div class="wheel-pointer"></div>
       <canvas id="wheelCanvas" width="450" height="450"></canvas>
-      <!-- 반투명 틱 오버레이 -->
       <div class="tick-overlay" id="tickOverlay"></div>
-      <!-- 최종 당첨자 오버레이 (반투명 다크 스타일로 통일됨) -->
       <div class="winner-overlay" id="winnerOverlay">🎉 당첨자 🎉</div>
     </div>
     
     <div class="action-buttons">
-      <button class="shuffle-btn" onclick="shuffleWheel()">섞기</button>
+      <button class="shuffle-btn" id="shuffleBtn" onclick="shuffleWheel()">섞기</button>
       <button class="spin-btn" id="spinBtn" onclick="spinWheel()">시작</button>
       <button class="stop-btn" id="stopBtn" onclick="stopWheel()" disabled>중지</button>
     </div>
@@ -536,11 +532,10 @@
     const dt = now - lastFrameTime;
     lastFrameTime = now;
     
-    // 속도 2배 증가 로직 유지
-    currentAngle += 0.024 * dt; 
+    // 속도 2배 증가 로직 
+    currentAngle += 0.048 * dt; 
     drawWheel();
     
-    // 실시간 당첨자 오버레이 업데이트
     const hovered = getCurrentHoveredParticipant();
     if (hovered) {
       document.getElementById('tickOverlay').innerText = hovered.name;
@@ -557,12 +552,11 @@
     isContinuous = true;
     lastFrameTime = 0;
     
+    document.getElementById('shuffleBtn').disabled = true; // 섞기 버튼 잠금
     document.getElementById('spinBtn').disabled = true;
     document.getElementById('stopBtn').disabled = false;
     
     document.getElementById('winnerOverlay').style.display = 'none';
-    
-    // 반투명 실시간 오버레이 노출
     document.getElementById('tickOverlay').style.display = 'block';
 
     requestAnimationFrame(spinContinuous);
@@ -590,7 +584,6 @@
 
       drawWheel();
       
-      // 감속 중 실시간 오버레이 업데이트
       const hovered = getCurrentHoveredParticipant();
       if (hovered) {
         document.getElementById('tickOverlay').innerText = hovered.name;
@@ -601,7 +594,8 @@
       } else {
         isSpinning = false;
         document.getElementById('spinBtn').disabled = false;
-        // 최종 멈춤 시 실시간 틱 오버레이 숨김 처리
+        document.getElementById('shuffleBtn').disabled = false; // 섞기 버튼 잠금 해제
+        
         document.getElementById('tickOverlay').style.display = 'none';
         calculateWinner();
       }
