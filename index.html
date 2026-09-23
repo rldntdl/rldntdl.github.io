@@ -580,8 +580,7 @@
       lastFrameTime = now;
       
       // ✨ 마찰 엔진 로직: 시간 제한 없이 현재 속도에 곱해져 0으로 점진 수렴
-      // 0.9993 마찰계수 사용 시 초기 속도 0.048이 임계값 0.0001로 줄어드는데 약 8.8초 소요 (10초 이내 보장)
-      const friction = Math.pow(0.9993, dt);
+      const friction = Math.pow(0.9994, dt);
       currentVelocity *= friction;
       currentAngle += currentVelocity * dt;
 
