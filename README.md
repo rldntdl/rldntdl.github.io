@@ -1,1 +1,1 @@
-ㅇ URL : https://rldntdl.github.io/roulette/
+ㅇ URL : https://rldntdl.github.io
