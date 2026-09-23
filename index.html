@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>룰렛 (Feat. 기웃이)</title>
   
+  <!-- 구글 애드센스 스크립트 -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946635505934816" crossorigin="anonymous"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
     body { background-color: #1a1a24; color: #fff; padding: 20px; overflow-x: hidden; }
@@ -61,13 +64,8 @@
       display: none;
       z-index: 20;
       pointer-events: none;
-      /* Fade-out transition */
       opacity: 1;
       transition: opacity 1s ease-in-out;
-    }
-    
-    .winner-overlay.fade-out {
-      opacity: 0;
     }
 
     .action-buttons { display: flex; gap: 15px; width: 100%; max-width: 450px; margin-top: 20px; }
@@ -87,6 +85,21 @@
       opacity: 0; transform: translateY(-20px); transition: 0.3s all ease;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* 이용안내 하단 가이드 패널 (애드센스 승인용) */
+    .info-panel {
+      max-width: 1400px;
+      margin: 25px auto 0;
+      background: #252636;
+      border-radius: 12px;
+      padding: 25px;
+      line-height: 1.8;
+      color: #b8b9cb;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .info-panel h3 { color: #ffcc00; font-size: 1.2rem; margin-bottom: 12px; border-bottom: 1px solid #3d3f58; padding-bottom: 8px; }
+    .info-panel h4 { color: #ff3366; font-size: 1.05rem; margin: 15px 0 8px; }
+    .info-panel ul { padding-left: 20px; }
   </style>
 </head>
 <body>
@@ -165,18 +178,26 @@
   </div>
 </div>
 
+<!-- 애드센스 심사 승인 및 사용자 안내를 위한 하단 가이드 영역 -->
+<div class="info-panel">
+  <h3>📌 팬더TV 기념일 룰렛 자동 계산기 이용 안내</h3>
+  <p>본 플랫폼은 인터넷 방송 진행 시 기념일 및 시청자 이벤트 방송에서 활용할 수 있는 자동 룰렛 시스템입니다. 후원된 하트 개수에 따른 룰렛 비율 계산을 효율적으로 보조합니다.</p>
+  
+  <h4>✨ 주요 기능 및 사용 방법</h4>
+  <ul>
+    <li><strong>타이틀 custom:</strong> 1번 항목에서 이벤트 콘셉트에 맞춰 룰렛 메인 제목을 실시간으로 변경할 수 있습니다.</li>
+    <li><strong>하트 기준 자동 산출:</strong> 2번 항목에서 차등 기준을 등록하면 하트 후원액에 맞춰 내림차순으로 계산하여 자동으로 룰렛 칸수를 부여합니다.</li>
+    <li><strong>명단 및 칸수 가감 (+/-):</strong> 참여자 등록 후 당첨이나 이벤트 보너스 발생 시 자유롭게 최종 칸수를 조정할 수 있습니다.</li>
+    <li><strong>배열 섞기 연출:</strong> '섞기' 버튼 이용 시 참여 명단 순서는 고정된 채 룰렛판의 시각적 위치만 무작위로 재배치됩니다.</li>
+  </ul>
+</div>
+
 <script>
   let criteriaList = []; 
-  
-  // 참여자 명단: 입력한 순서가 그대로 유지되는 배열
-  let participants = []; // { id, name, hearts, adjSlots, finalSlots }
-  
-  // 룰렛판 순서: 시각적 배치를 위한 고유 ID 배열 (섞기 전용)
+  let participants = []; 
   let wheelOrderIds = []; 
   
   const colors = ['#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71', '#e67e22', '#34495e'];
-  let winnerFadeTimeout1 = null;
-  let winnerFadeTimeout2 = null;
 
   window.onload = function() {
     renderCriteria();
@@ -222,9 +243,7 @@
   }
 
   function renderCriteria() {
-    // 하트 기준 내림차순 정렬
     criteriaList.sort((a, b) => b.heart - a.heart);
-    
     const tbody = document.getElementById('criteriaBody');
     tbody.innerHTML = '';
     
@@ -292,7 +311,6 @@
       finalSlots: 0
     });
     
-    // 추가된 참여자의 ID를 룰렛 순서 배열에도 등록
     wheelOrderIds.push(newId);
 
     nameInput.value = '';
@@ -322,14 +340,12 @@
     const tbody = document.getElementById('userBody');
     tbody.innerHTML = '';
 
-    // 입력한 순서(등록 순서) 그대로 유지 (자동 정렬 제거)
-
     participants.forEach((p, index) => {
       const autoSlots = calculateAutoSlots(p.hearts);
       const finalSlots = Math.max(0, autoSlots + p.adjSlots);
       p.finalSlots = finalSlots;
 
-      const rank = index + 1; // 단순 입력 번호
+      const rank = index + 1;
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -356,14 +372,12 @@
   function shuffleWheel() {
     if (wheelOrderIds.length === 0) return;
     
-    // Fisher-Yates 셔플: 룰렛 순서 배열만 무작위로 섞음
     for (let i = wheelOrderIds.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [wheelOrderIds[i], wheelOrderIds[j]] = [wheelOrderIds[j], wheelOrderIds[i]];
     }
     
     drawWheel();
-    // 요청에 따라 안내 팝업 노출 안함
   }
 
   function drawWheel() {
@@ -406,7 +420,6 @@
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // 텍스트 출력 (닉네임만 표시)
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate(startAngle + sliceAngle / 2);
@@ -434,9 +447,8 @@
     const overlay = document.getElementById('winnerOverlay');
     overlay.style.display = 'none';
 
-    // USER REQUESTED SUSPENSE PHYSICS:
-    const rotateAngle = Math.floor(Math.random() * 360) + 2000; // 회전수 최적화
-    const duration = 8500; // 8.5초 동안 서서히 감속
+    const rotateAngle = Math.floor(Math.random() * 360) + 2000;
+    const duration = 8500;
     const startTimestamp = performance.now();
     const initialAngle = currentAngle;
 
@@ -444,7 +456,6 @@
       const elapsed = now - startTimestamp;
       const progress = Math.min(elapsed / duration, 1);
       
-      // 긴장감을 위해 마지막에 서서히 멈추는 곡선 (2.5 제곱)
       const easeOut = (t) => 1 - Math.pow(1 - t, 2.5);
       
       const currentRotate = (rotateAngle * Math.PI / 180) * easeOut(progress);
@@ -489,7 +500,6 @@
       const overlay = document.getElementById('winnerOverlay');
       overlay.innerHTML = `🎉 당첨: ${winner.name} 🎉`;
       
-      // 3초 후 서서히 사라지는(Fade-out) 효과 적용
       overlay.style.display = 'block';
       overlay.style.opacity = '1';
       overlay.style.transition = 'none'; 
