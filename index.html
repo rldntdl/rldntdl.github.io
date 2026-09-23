@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>팬더TV 기념일 룰렛 시스템</title>
+  <title>룰렛 (Feat. 기웃이)</title>
   
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', 'Noto Sans KR', sans-serif; }
@@ -30,7 +30,7 @@
     .input-group input { flex: 1; padding: 10px; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; border-radius: 6px; }
     
     button { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: 0.2s; }
-    .btn-primary { background: #ff3366; color: #fff; padding: 10px 20px; }
+    .btn-primary { background: #ff3366; color: #fff; padding: 10px 20px; min-width: 80px; }
     .btn-primary:hover { background: #e02e5a; }
     .btn-danger { background: #e74c3c; color: #fff; padding: 4px 12px; }
 
@@ -61,6 +61,13 @@
       display: none;
       z-index: 20;
       pointer-events: none;
+      /* Fade-out transition */
+      opacity: 1;
+      transition: opacity 1s ease-in-out;
+    }
+    
+    .winner-overlay.fade-out {
+      opacity: 0;
     }
 
     .action-buttons { display: flex; gap: 15px; width: 100%; max-width: 450px; margin-top: 20px; }
@@ -87,13 +94,13 @@
 <div id="toast-container"></div>
 
 <div class="container">
-  <!-- Left Panel for Controls -->
   <div class="panel left-panel">
     
     <!-- 1. Title Settings -->
     <h2>1. 룰렛 제목 설정</h2>
     <div class="input-group">
-      <input type="text" id="titleInput" placeholder="룰렛 제목을 입력하세요" value="기념일 룰렛" oninput="updateTitle()">
+      <input type="text" id="titleInput" placeholder="룰렛 제목을 입력하세요" value="기념일 룰렛">
+      <button class="btn-primary" onclick="updateTitle()">적용</button>
     </div>
 
     <!-- 2. Criteria Settings -->
@@ -116,18 +123,18 @@
       </tbody>
     </table>
 
-    <!-- 3. Participant List & Adjustment (Merged) -->
+    <!-- 3. Participant List & Adjustment -->
     <h2>3. 참여자 명단 및 칸수 조정</h2>
     <div class="input-group">
       <input type="text" id="userName" placeholder="닉네임">
-      <input type="number" id="userHearts" placeholder="하트 수 (예: 55725)">
+      <input type="number" id="userHearts" placeholder="하트 수">
       <button class="btn-primary" onclick="addParticipant()">참여자 등록</button>
     </div>
     
     <table>
       <thead>
         <tr>
-          <th>순위</th>
+          <th>번호</th>
           <th>닉네임</th>
           <th>하트수</th>
           <th>자동계산</th>
@@ -142,7 +149,6 @@
     </table>
   </div>
 
-  <!-- Right Panel for Roulette -->
   <div class="panel right-panel">
     <h2 id="rouletteTitleDisplay">기념일 룰렛</h2>
     
@@ -162,14 +168,15 @@
 <script>
   let criteriaList = []; 
   
-  // Array holding the true data, will ALWAYS be sorted by hearts descending.
-  let participants = []; // Structure: { id, name, hearts, adjSlots, finalSlots }
+  // 참여자 명단: 입력한 순서가 그대로 유지되는 배열
+  let participants = []; // { id, name, hearts, adjSlots, finalSlots }
   
-  // Array holding ONLY IDs. This dictactes the visual order on the roulette wheel.
-  // Shuffling happens ONLY to this array.
+  // 룰렛판 순서: 시각적 배치를 위한 고유 ID 배열 (섞기 전용)
   let wheelOrderIds = []; 
   
   const colors = ['#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71', '#e67e22', '#34495e'];
+  let winnerFadeTimeout1 = null;
+  let winnerFadeTimeout2 = null;
 
   window.onload = function() {
     renderCriteria();
@@ -184,10 +191,8 @@
     toast.innerText = message;
     container.appendChild(toast);
     
-    // Trigger animation
     setTimeout(() => toast.classList.add('show'), 10);
     
-    // Remove after 3 seconds
     setTimeout(() => {
       toast.classList.remove('show');
       setTimeout(() => toast.remove(), 300);
@@ -217,7 +222,7 @@
   }
 
   function renderCriteria() {
-    // Sort descending by Hearts
+    // 하트 기준 내림차순 정렬
     criteriaList.sort((a, b) => b.heart - a.heart);
     
     const tbody = document.getElementById('criteriaBody');
@@ -277,7 +282,6 @@
       return; 
     }
 
-    // Unique ID is critical for maintaining references during sorting/shuffling
     const newId = Date.now();
     
     participants.push({
@@ -288,7 +292,7 @@
       finalSlots: 0
     });
     
-    // Add the new ID to the wheel ordering array
+    // 추가된 참여자의 ID를 룰렛 순서 배열에도 등록
     wheelOrderIds.push(newId);
 
     nameInput.value = '';
@@ -298,7 +302,6 @@
     drawWheel();
   }
 
-  // Adjust slots based on unique ID, not array index
   function adjustSlot(id, delta) {
     const p = participants.find(part => part.id === id);
     if (p) {
@@ -308,7 +311,6 @@
     }
   }
 
-  // Delete based on unique ID
   function deleteParticipant(id) {
     participants = participants.filter(part => part.id !== id);
     wheelOrderIds = wheelOrderIds.filter(wheelId => wheelId !== id);
@@ -320,15 +322,14 @@
     const tbody = document.getElementById('userBody');
     tbody.innerHTML = '';
 
-    // CRITICAL REQUIREMENT: Always strictly sort the TABLE by hearts descending
-    participants.sort((a, b) => b.hearts - a.hearts);
+    // 입력한 순서(등록 순서) 그대로 유지 (자동 정렬 제거)
 
     participants.forEach((p, index) => {
       const autoSlots = calculateAutoSlots(p.hearts);
       const finalSlots = Math.max(0, autoSlots + p.adjSlots);
-      p.finalSlots = finalSlots; // Update final slots state for drawing later
+      p.finalSlots = finalSlots;
 
-      const rank = index + 1;
+      const rank = index + 1; // 단순 입력 번호
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -352,18 +353,17 @@
   let currentAngle = 0;
   let isSpinning = false;
 
-  // Shuffle ONLY the wheel sequence (wheelOrderIds), not the participant array.
-  // This ensures the table on the left stays sorted by Hearts.
   function shuffleWheel() {
     if (wheelOrderIds.length === 0) return;
     
-    // Fisher-Yates Shuffle on the visual order IDs
+    // Fisher-Yates 셔플: 룰렛 순서 배열만 무작위로 섞음
     for (let i = wheelOrderIds.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [wheelOrderIds[i], wheelOrderIds[j]] = [wheelOrderIds[j], wheelOrderIds[i]];
     }
     
     drawWheel();
+    // 요청에 따라 안내 팝업 노출 안함
   }
 
   function drawWheel() {
@@ -388,7 +388,6 @@
 
     let startAngle = currentAngle;
 
-    // Iterate drawing using the potentially shuffled wheelOrderIds array
     wheelOrderIds.forEach((id, i) => {
       const p = participants.find(part => part.id === id);
       if (!p || p.finalSlots <= 0) return;
@@ -396,7 +395,6 @@
       const sliceAngle = (p.finalSlots / totalSlotsSum) * (Math.PI * 2);
       const endAngle = startAngle + sliceAngle;
 
-      // Draw Slice Background
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
       ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -408,7 +406,7 @@
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Draw text (Name only, no slot counts)
+      // 텍스트 출력 (닉네임만 표시)
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate(startAngle + sliceAngle / 2);
@@ -417,7 +415,6 @@
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 16px sans-serif';
       
-      // Skip text if slice is visually too thin
       if (sliceAngle > 0.08) { 
         ctx.fillText(`${p.name}`, radius - 20, 0);
       }
@@ -434,13 +431,12 @@
     isSpinning = true;
     document.getElementById('spinBtn').disabled = true;
     
-    // Hide overlay when starting spin
     const overlay = document.getElementById('winnerOverlay');
     overlay.style.display = 'none';
 
-    // Random minimum rotation + extra random degrees
-    const rotateAngle = Math.floor(Math.random() * 360) + 2500; // ~5+ spins
-    const duration = =000; // 5 seconds
+    // USER REQUESTED SUSPENSE PHYSICS:
+    const rotateAngle = Math.floor(Math.random() * 360) + 2000; // 회전수 최적화
+    const duration = 8500; // 8.5초 동안 서서히 감속
     const startTimestamp = performance.now();
     const initialAngle = currentAngle;
 
@@ -448,8 +444,8 @@
       const elapsed = now - startTimestamp;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Easing function: easeOutCubic (slows down cleanly at the end)
-      const easeOut = (t) => 1 - Math.pow(1 - t, 5);
+      // 긴장감을 위해 마지막에 서서히 멈추는 곡선 (2.5 제곱)
+      const easeOut = (t) => 1 - Math.pow(1 - t, 2.5);
       
       const currentRotate = (rotateAngle * Math.PI / 180) * easeOut(progress);
       currentAngle = initialAngle + currentRotate;
@@ -471,15 +467,12 @@
   function calculateWinner() {
     const totalSlotsSum = participants.reduce((sum, p) => sum + (p.finalSlots || 0), 0);
     
-    // The pointer is at the very top (-90 degrees, or -Math.PI / 2).
-    // Normalize currentAngle to figure out where the wheel stopped relative to the pointer.
     let normalizedAngle = (Math.PI * 2 - (currentAngle % (Math.PI * 2)) - Math.PI / 2) % (Math.PI * 2);
     if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
 
     let currentSumAngle = 0;
     let winner = null;
 
-    // Traverse segments strictly in the order they were drawn (wheelOrderIds)
     for (let id of wheelOrderIds) {
       const p = participants.find(part => part.id === id);
       if (!p || p.finalSlots <= 0) continue;
@@ -495,7 +488,19 @@
     if (winner) {
       const overlay = document.getElementById('winnerOverlay');
       overlay.innerHTML = `🎉 당첨: ${winner.name} 🎉`;
+      
+      // 3초 후 서서히 사라지는(Fade-out) 효과 적용
       overlay.style.display = 'block';
+      overlay.style.opacity = '1';
+      overlay.style.transition = 'none'; 
+      
+      setTimeout(() => {
+        overlay.style.transition = 'opacity 1s ease';
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 1000);
+      }, 3000);
     }
   }
 </script>
