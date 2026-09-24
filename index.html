@@ -13,7 +13,7 @@
     
     .container { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; flex-wrap: wrap; }
     .panel { background: #252636; border-radius: 12px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-    .left-panel { flex: 1.2; min-width: 600px; } /* 테이블 확장을 위해 최소 너비 소폭 증가 */
+    .left-panel { flex: 1.2; min-width: 600px; }
     .right-panel { flex: 0.8; min-width: 450px; display: flex; flex-direction: column; align-items: center; }
 
     h2 { font-size: 1.2rem; color: #ff3366; margin-bottom: 15px; border-bottom: 2px solid #33354a; padding-bottom: 8px; margin-top: 25px; }
@@ -22,13 +22,12 @@
     #rouletteTitleDisplay { font-size: 2rem; color: #ffffff; border: none; margin-bottom: 20px; margin-top: 0; text-align: center; }
 
     table { width: 100%; border-collapse: collapse; margin-bottom: 15px; text-align: center; font-size: 0.9rem; }
-    th, td { border: 1px solid #3d3f58; padding: 8px 4px; vertical-align: middle; }
+    th, td { border: 1px solid #3d3f58; padding: 8px 4px; }
     th { background-color: #2e3047; color: #ffcc00; }
     td input[type="number"], td input[type="text"] {
-      width: 95%; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; text-align: center; border-radius: 4px; padding: 6px;
+      width: 95%; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; text-align: center; border-radius: 4px; padding: 4px;
     }
     
-    /* 닉네임 입력칸 왼쪽 정렬 보정 */
     td input[type="text"] { text-align: left; padding-left: 8px; }
 
     .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -37,19 +36,13 @@
     button { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: 0.2s; }
     .btn-primary { background: #ff3366; color: #fff; padding: 10px 20px; min-width: 80px; }
     .btn-primary:hover { background: #e02e5a; }
-    
-    .btn-danger { background: #e74c3c; color: #fff; padding: 6px 10px; width: 60px; }
-    .btn-danger:hover { background: #c0392b; }
-    .btn-info { background: #3498db; color: #fff; padding: 6px 10px; width: 60px; } /* 적용 버튼용 파란색 */
+    .btn-danger { background: #e74c3c; color: #fff; padding: 4px 10px; }
+    .btn-info { background: #3498db; color: #fff; padding: 4px 10px; }
     .btn-info:hover { background: #2980b9; }
 
-    .adj-btn { width: 28px; height: 28px; border-radius: 50%; font-size: 16px; margin: 0 auto; display: block; }
+    .adj-btn { width: 26px; height: 26px; border-radius: 50%; font-size: 14px; margin: 0 2px; }
     .btn-plus { background: #2ecc71; color: #fff; }
-    .btn-plus:hover { background: #27ae60; }
     .btn-minus { background: #e67e22; color: #fff; }
-    .btn-minus:hover { background: #d35400; }
-    
-    .btn-stack { display: flex; flex-direction: column; gap: 6px; align-items: center; justify-content: center; }
 
     .wheel-container { position: relative; margin: 10px 0; width: 450px; height: 450px; }
     
@@ -211,7 +204,7 @@
           <th style="width: 140px;">참여자</th>
           <th style="width: 90px;">후원금액</th>
           <th style="width: 70px;">자동계산</th>
-          <th style="width: 50px;">조정</th>
+          <th style="width: 80px;">조정</th>
           <th style="width: 100px;">최종 칸수</th>
           <th style="width: 70px;">관리</th>
         </tr>
@@ -269,6 +262,7 @@
   let criteriaList = []; 
   let participants = []; 
   let wheelOrderIds = []; 
+  let addCount = 0;
   
   const colors = ['#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71', '#e67e22', '#34495e'];
 
@@ -375,17 +369,17 @@
     }
 
     const newId = Date.now();
-    const newParticipant = {
+    addCount++;
+    
+    participants.unshift({
       id: newId,
       name: name,
       hearts: hearts,
       adjSlots: 0,
       finalSlots: 0,
-      originalOrder: participants.length + 1
-    };
+      order: addCount
+    });
     
-    // 배열의 맨 앞에 추가 (내림차순 정렬)
-    participants.unshift(newParticipant);
     wheelOrderIds.push(newId);
 
     nameInput.value = '';
@@ -437,21 +431,21 @@
   function renderUsers() {
     const tbody = document.getElementById('userBody');
     tbody.innerHTML = '';
-    
-    let totalAllSlots = 0;
+
+    let totalGlobalSlots = 0;
     participants.forEach(p => {
       const autoSlots = calculateAutoSlots(p.hearts);
       p.finalSlots = Math.max(0, autoSlots + p.adjSlots);
-      totalAllSlots += p.finalSlots;
+      totalGlobalSlots += p.finalSlots;
     });
 
-    participants.forEach(p => {
+    participants.forEach((p) => {
       const autoSlots = calculateAutoSlots(p.hearts);
-      const percentage = totalAllSlots > 0 ? ((p.finalSlots / totalAllSlots) * 100).toFixed(1) : 0.0;
+      const prob = totalGlobalSlots > 0 ? ((p.finalSlots / totalGlobalSlots) * 100).toFixed(1) : "0.0";
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${p.originalOrder}</td>
+        <td>${p.order}</td>
         <td>
           <input type="text" id="name-${p.id}" value="${p.name}" style="font-weight: bold; width: 100%;">
         </td>
@@ -460,19 +454,19 @@
         </td>
         <td>${autoSlots}칸</td>
         <td>
-          <div class="adj-btn-container">
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
             <button class="adj-btn btn-plus" onclick="adjustSlot(${p.id}, 1)">+</button>
             <button class="adj-btn btn-minus" onclick="adjustSlot(${p.id}, -1)">-</button>
           </div>
         </td>
         <td style="color:#ffcc00; font-weight:bold;">
-          ${p.finalSlots}칸
-          <div style="font-size: 0.8rem; color:#b8b9cb; margin-top:3px;">(${percentage}%)</div>
+          ${p.finalSlots}칸<br>
+          <span style="font-size: 0.8rem; color:#b8b9cb;">(${prob}%)</span>
         </td>
         <td>
-          <div class="btn-stack">
-            <button class="btn-info" onclick="updateParticipant(${p.id})">적용</button>
-            <button class="btn-danger" onclick="deleteParticipant(${p.id})">삭제</button>
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
+            <button class="btn-info" style="width:50px; font-size:12px;" onclick="updateParticipant(${p.id})">적용</button>
+            <button class="btn-danger" style="width:50px; font-size:12px;" onclick="deleteParticipant(${p.id})">삭제</button>
           </div>
         </td>
       `;
@@ -669,19 +663,15 @@
 
     if (winner) {
       const overlay = document.getElementById('winnerOverlay');
-      overlay.innerHTML = `🎉 당첨: ${winner.name} 🎉`;
+      // '당첨: ' 문구를 제거하고 이름만 깔끔하게 표시
+      overlay.innerHTML = `🎉 ${winner.name} 🎉`;
       
       overlay.style.display = 'block';
       overlay.style.opacity = '1';
       overlay.style.transition = 'none'; 
       
-      setTimeout(() => {
-        overlay.style.transition = 'opacity 1s ease';
-        overlay.style.opacity = '0';
-        setTimeout(() => {
-          overlay.style.display = 'none';
-        }, 1000);
-      }, 3000);
+      // 당첨 레터박스가 서서히 사라지는 setTimeout 로직 완전 제거
+      // 다음 게임 시작(spinWheel) 버튼을 누를 때까지 계속 유지됩니다.
     }
   }
 </script>
