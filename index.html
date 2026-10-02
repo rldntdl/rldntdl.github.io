@@ -28,7 +28,6 @@
     td input[type="number"], td input[type="text"] {
       width: 95%; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; text-align: center; border-radius: 4px; padding: 4px;
     }
-    
     td input[type="text"] { text-align: left; padding-left: 8px; }
 
     .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -124,39 +123,15 @@
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
     .info-panel h3 { 
-      color: #ff3366; 
-      font-size: 1.2rem; 
-      margin-top: 25px; 
-      margin-bottom: 12px; 
-      border-bottom: 1px solid #3d3f58; 
-      padding-bottom: 8px; 
+      color: #ff3366; font-size: 1.2rem; margin-top: 25px; margin-bottom: 12px; border-bottom: 1px solid #3d3f58; padding-bottom: 8px; 
     }
     .info-panel h3:first-child { margin-top: 0; }
-    .info-panel h4 { color: #ff3366; font-size: 1.05rem; margin: 15px 0 8px; }
     .info-panel ul { padding-left: 20px; }
 
     .donate-btn {
-      position: fixed;
-      bottom: 25px;
-      right: 25px;
-      background-color: #0050FF;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 30px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1rem;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-      transition: transform 0.2s, background-color 0.2s;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      position: fixed; bottom: 25px; right: 25px; background-color: #0050FF; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); transition: transform 0.2s, background-color 0.2s; z-index: 100; display: flex; align-items: center; gap: 8px;
     }
-    .donate-btn:hover {
-      transform: scale(1.05);
-      background-color: #003fcb;
-    }
+    .donate-btn:hover { transform: scale(1.05); background-color: #003fcb; }
   </style>
 </head>
 <body>
@@ -222,7 +197,7 @@
       <div class="wheel-pointer"></div>
       <canvas id="wheelCanvas" width="450" height="450"></canvas>
       <div class="tick-overlay" id="tickOverlay"></div>
-      <div class="winner-overlay" id="winnerOverlay">🎉 당첨자 🎉</div>
+      <div class="winner-overlay" id="winnerOverlay"></div>
     </div>
     
     <div class="action-buttons">
@@ -238,7 +213,7 @@
   <ul>
     <li>본 사이트는 공개 사이트로 누구나 이용 가능하며, 크롬에 최적화 되어 있습니다.</li>
     <li>인터넷 방송 플랫폼에서 기념일 및 시청자 이벤트 방송 시 활용할 수 있는 자동 룰렛 시스템입니다.</li>
-    <li>최종 하트수에 따른 룰렛 칸수와 확률 계산을 자동으로 계산하고 효율적으로 보조합니다.</li>
+    <li>하트에 따른 룰렛 칸수와 확률 계산을 자동으로 계산하고 효율적으로 보조합니다.</li>
   </ul>
   
   <h3>✨ 주요 기능 및 사용 방법</h3>
@@ -266,10 +241,6 @@
   let addCount = 0;
   
   const colors = ['#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71', '#e67e22', '#34495e'];
-  
-  // 룰렛 회전음 오디오 객체 생성 및 1회 재생 설정 (반복 안 함)
-  const spinSound = new Audio('roulette.mp3');
-  spinSound.loop = false;
 
   window.onload = function() {
     renderCriteria();
@@ -607,10 +578,6 @@
     isContinuous = true;
     lastFrameTime = 0;
     
-    // 룰렛 시작 시 오디오를 처음(0초)부터 1회 재생
-    spinSound.currentTime = 0;
-    spinSound.play().catch(e => console.log("오디오 재생 에러:", e));
-    
     document.getElementById('shuffleBtn').disabled = true; 
     document.getElementById('spinBtn').disabled = true;
     document.getElementById('stopBtn').disabled = false;
@@ -661,10 +628,6 @@
         const btns = document.querySelectorAll('#userBody button');
         inputs.forEach(input => input.disabled = false);
         btns.forEach(btn => btn.disabled = false);
-        
-        // 룰렛 정지 및 당첨자 표시 순간에 오디오 즉시 정지 및 초기화
-        spinSound.pause();
-        spinSound.currentTime = 0;
         
         document.getElementById('tickOverlay').style.display = 'none';
         calculateWinner();
