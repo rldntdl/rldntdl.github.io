@@ -84,7 +84,7 @@
       z-index: 20;
       pointer-events: none;
       opacity: 1;
-      transition: none; /* 사라짐 효과 완전 제거 */
+      transition: none;
     }
 
     .action-buttons { display: flex; gap: 10px; width: 100%; max-width: 450px; margin-top: 20px; }
@@ -112,7 +112,7 @@
     }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    .info-panel {
+    .info-panel, .guestbook-panel {
       max-width: 1400px;
       margin: 25px auto 0;
       background: #252636;
@@ -122,16 +122,30 @@
       color: #b8b9cb;
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
-    .info-panel h3 { 
+    .info-panel h3, .guestbook-panel h3 { 
       color: #ff3366; font-size: 1.2rem; margin-top: 25px; margin-bottom: 12px; border-bottom: 1px solid #3d3f58; padding-bottom: 8px; 
     }
-    .info-panel h3:first-child { margin-top: 0; }
+    .info-panel h3:first-child, .guestbook-panel h3:first-child { margin-top: 0; }
     .info-panel ul { padding-left: 20px; }
 
     .donate-btn {
       position: fixed; bottom: 25px; right: 25px; background-color: #0050FF; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); transition: transform 0.2s, background-color 0.2s; z-index: 100; display: flex; align-items: center; gap: 8px;
     }
     .donate-btn:hover { transform: scale(1.05); background-color: #003fcb; }
+
+    /* 방명록 관련 스타일 */
+    .comment-input-area { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .comment-input-row { display: flex; gap: 10px; }
+    .comment-input-area input { flex: 0.3; padding: 10px; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; border-radius: 6px; }
+    .comment-input-area textarea { flex: 1; padding: 10px; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; border-radius: 6px; resize: none; height: 80px; font-family: 'Pretendard', sans-serif; }
+    .comment-list { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
+    .comment-list::-webkit-scrollbar { width: 8px; }
+    .comment-list::-webkit-scrollbar-thumb { background-color: #4a4d6d; border-radius: 4px; }
+    .comment-item { background: #1a1a24; padding: 15px; border-radius: 8px; border-left: 4px solid #ff3366; }
+    .comment-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+    .comment-header strong { color: #fff; font-size: 1.05rem; }
+    .comment-time { color: #888; }
+    .comment-body { color: #d0d0e0; word-break: break-all; }
   </style>
 </head>
 <body>
@@ -230,9 +244,102 @@
   </ul>
 </div>
 
+<div class="guestbook-panel">
+  <h3>💬 방명록 및 사용 소감</h3>
+  <div class="comment-input-area">
+    <div class="comment-input-row">
+      <input type="text" id="gb-name" placeholder="닉네임 (최대 15자)" maxlength="15">
+      <button class="btn-primary" id="btn-gb-submit">등록하기</button>
+    </div>
+    <textarea id="gb-text" placeholder="응원의 메시지나 소감을 남겨주세요! (URL 등 홍보성 문구는 차단됩니다)" maxlength="300"></textarea>
+  </div>
+  <div id="gb-list" class="comment-list">
+    <div style="color: #888; text-align: center; padding: 20px;">로딩 중...</div>
+  </div>
+</div>
+
 <a href="https://buymeacoffee.com/rldntdl" target="_blank" class="donate-btn">
   ☕ 개발자 커피 후원하기
 </a>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+  // 사용자 제공 Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyB8hs8E8bedCBnuciMsW-DHaJ6qQUqUuuc",
+    authDomain: "roulette-guestbook.firebaseapp.com",
+    projectId: "roulette-guestbook",
+    storageBucket: "roulette-guestbook.firebasestorage.app",
+    messagingSenderId: "377433084609",
+    appId: "1:377433084609:web:02de37e6cbd485e1a27a40"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const gbRef = ref(db, 'guestbook');
+
+  document.getElementById('btn-gb-submit').addEventListener('click', () => {
+    const name = document.getElementById('gb-name').value.trim();
+    const text = document.getElementById('gb-text').value.trim();
+    
+    if(!name || !text) {
+        window.showToast("닉네임과 내용을 모두 입력해주세요.");
+        return;
+    }
+
+    // URL 및 도메인 필터링 정규식
+    const urlRegex = /(https?:\/\/|www\.)|([a-zA-Z0-9-]+\.(com|net|kr|co\.kr|org|io|me|info|biz))/i;
+    if(urlRegex.test(name) || urlRegex.test(text)) {
+        window.showToast("링크(URL)는 홍보 방지를 위해 등록할 수 없습니다.");
+        return;
+    }
+
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    push(gbRef, {
+        name: name,
+        text: text,
+        date: dateStr,
+        timestamp: serverTimestamp()
+    });
+
+    document.getElementById('gb-name').value = '';
+    document.getElementById('gb-text').value = '';
+    window.showToast('방명록이 성공적으로 등록되었습니다.');
+  });
+
+  onValue(gbRef, (snapshot) => {
+    const list = document.getElementById('gb-list');
+    list.innerHTML = '';
+    const data = snapshot.val();
+    
+    if(data) {
+        // 객체를 배열로 변환 후 최신순(역순)으로 정렬
+        const entries = Object.values(data).reverse(); 
+        entries.forEach(entry => {
+            const div = document.createElement('div');
+            div.className = 'comment-item';
+            
+            const safeName = window.escapeHTML(entry.name);
+            const safeText = window.escapeHTML(entry.text).replace(/\n/g, '<br>');
+            
+            div.innerHTML = `
+                <div class="comment-header">
+                    <strong>${safeName}</strong>
+                    <span class="comment-time">${entry.date}</span>
+                </div>
+                <div class="comment-body">${safeText}</div>
+            `;
+            list.appendChild(div);
+        });
+    } else {
+        list.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">아직 작성된 방명록이 없습니다. 첫 소감을 남겨주세요!</div>';
+    }
+  });
+</script>
 
 <script>
   let criteriaList = []; 
@@ -248,7 +355,13 @@
     drawWheel();
   };
 
-  function showToast(message) {
+  window.escapeHTML = function(str) {
+      return str.replace(/[&<>'"]/g, tag => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag] || tag));
+  };
+
+  window.showToast = function(message) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -281,7 +394,7 @@
       renderCriteria();
       recalculateAllUsers();
     } else {
-      showToast('올바른 하트와 칸수를 입력하세요.');
+      window.showToast('올바른 하트와 칸수를 입력하세요.');
     }
   }
 
@@ -340,7 +453,7 @@
     const hearts = Number(heartsInput.value) || 0;
 
     if (!name) { 
-      showToast('참여자 이름을 입력해 주세요.'); 
+      window.showToast('참여자 이름을 입력해 주세요.'); 
       return; 
     }
 
@@ -392,7 +505,7 @@
       const newHearts = Number(heartsInput.value) || 0;
       
       if (!newName) {
-        showToast('참여자 이름을 입력해 주세요.');
+        window.showToast('참여자 이름을 입력해 주세요.');
         return;
       }
       
@@ -401,7 +514,7 @@
       
       renderUsers();
       drawWheel();
-      showToast('참여자 정보가 수정되었습니다.');
+      window.showToast('참여자 정보가 수정되었습니다.');
     }
   }
 
@@ -605,7 +718,7 @@
       if (dt > 50) dt = 16;
       lastFrameTime = now;
       
-      // 13.45초 동안 지속되는 극적인 감속
+      // 13.45초 동안 지속되는 극적인 감속 마찰 엔진 적용
       const friction = Math.pow(0.9994, dt);
       currentVelocity *= friction;
       currentAngle += currentVelocity * dt;
@@ -643,7 +756,7 @@
     if (winner) {
       const overlay = document.getElementById('winnerOverlay');
       // 간소화된 당첨 메시지 적용 (다음 시작 전까지 사라지지 않음)
-      overlay.innerHTML = `🎉 ${winner.name} 🎉`;
+      overlay.innerHTML = `🎉 ${window.escapeHTML(winner.name)} 🎉`;
       
       overlay.style.display = 'block';
       overlay.style.opacity = '1';
