@@ -311,19 +311,27 @@
   function showToast(message) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerText = message;
+    toast.className = 'toast'; toast.innerText = message;
     container.appendChild(toast);
     setTimeout(() => toast.classList.add('show'), 10);
     setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
   }
 
   function updateTitle() {
-    const titleText = document.getElementById('titleInput').value || '돌려돌려 돌림판🍀';
+    const titleText = document.getElementById('titleInput').value || '🌀돌려돌려 돌림판🌀';
     document.getElementById('rouletteTitleDisplay').innerText = titleText;
+    showToast('제목이 변경되었습니다.');
   }
 
-  // --- 2. 하트/칸수 기준 설정 부분 개선 ---
+  // 제목 입력창 엔터키 이벤트 추가
+  document.getElementById('titleInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      updateTitle();
+      e.target.blur(); // 엔터 후 포커스 해제하여 키보드 닫기
+    }
+  });
+
+  // 기준 설정 엔터키 이벤트 추가
   document.getElementById('newHeart').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') document.getElementById('newSlot').focus();
   });
@@ -334,28 +342,15 @@
   function addCriteria() {
     const heartInput = document.getElementById('newHeart');
     const slotInput = document.getElementById('newSlot');
-    const h = Number(heartInput.value);
-    const s = Number(slotInput.value);
+    const h = Number(heartInput.value); const s = Number(slotInput.value);
 
-    if (!heartInput.value || h <= 0) { 
-      showToast('하트 기준을 1 이상 입력해 주세요.'); 
-      heartInput.focus(); // 오류 시 포커스 되돌림
-      return; 
-    }
-    if (!slotInput.value || s <= 0) { 
-      showToast('부여 칸수를 1 이상 입력해 주세요.'); 
-      slotInput.focus(); // 오류 시 포커스 되돌림
-      return; 
-    }
+    if (!heartInput.value || h <= 0) { showToast('하트 기준을 1 이상 입력해 주세요.'); heartInput.focus(); return; }
+    if (!slotInput.value || s <= 0) { showToast('부여 칸수를 1 이상 입력해 주세요.'); slotInput.focus(); return; }
 
     criteriaList.push({ heart: h, slot: s });
-    heartInput.value = ''; 
-    slotInput.value = '';
-    renderCriteria(); 
-    recalculateAllUsers();
-    
-    // 추가 완료 후 다시 하트 입력창으로 자동 포커스
-    heartInput.focus();
+    heartInput.value = ''; slotInput.value = '';
+    renderCriteria(); recalculateAllUsers();
+    heartInput.focus(); // 엔터 후 연속 추가를 위해 하트 입력창으로 포커스
   }
 
   function renderCriteria() {
@@ -385,7 +380,7 @@
 
   function recalculateAllUsers() { renderUsers(); drawWheel(); }
 
-  // --- 3. 참여자 명단 추가 부분 ---
+  // 참여자 명단 신규 추가 엔터키 이벤트
   document.getElementById('userName').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') document.getElementById('userHearts').focus();
   });
@@ -396,32 +391,18 @@
   function addParticipant() {
     const nameInput = document.getElementById('userName');
     const heartsInput = document.getElementById('userHearts');
-    const name = nameInput.value.trim();
-    const hearts = Number(heartsInput.value);
+    const name = nameInput.value.trim(); const hearts = Number(heartsInput.value);
 
-    if (!name) { 
-      showToast('참여자 이름을 입력해 주세요.'); 
-      nameInput.focus();
-      return; 
-    }
-    if (!heartsInput.value || hearts <= 0) { 
-      showToast('하트 수를 1 이상 입력해 주세요.'); 
-      heartsInput.focus();
-      return; 
-    }
+    if (!name) { showToast('참여자 이름을 입력해 주세요.'); nameInput.focus(); return; }
+    if (!heartsInput.value || hearts <= 0) { showToast('하트 수를 1 이상 입력해 주세요.'); heartsInput.focus(); return; }
 
-    const newId = Date.now();
-    addCount++;
+    const newId = Date.now(); addCount++;
     participants.unshift({ id: newId, name: name, hearts: hearts, adjSlots: 0, finalSlots: 0, order: addCount });
     wheelOrderIds.push(newId);
 
-    nameInput.value = ''; 
-    heartsInput.value = '';
-    renderUsers(); 
-    drawWheel();
-    
-    // 추가 후 다시 참여자 이름 입력창으로 포커스
-    nameInput.focus();
+    nameInput.value = ''; heartsInput.value = '';
+    renderUsers(); drawWheel();
+    nameInput.focus(); // 엔터 후 연속 추가를 위해 이름 입력창으로 포커스
   }
 
   function adjustSlot(id, delta) {
@@ -440,8 +421,7 @@
     if (p) {
       const nameInput = document.getElementById(`name-${id}`);
       const heartsInput = document.getElementById(`hearts-${id}`);
-      const newName = nameInput.value.trim();
-      const newHearts = Number(heartsInput.value);
+      const newName = nameInput.value.trim(); const newHearts = Number(heartsInput.value);
       
       if (!newName) { showToast('참여자 이름을 입력해 주세요.'); nameInput.focus(); return; }
       if (!heartsInput.value || newHearts <= 0) { showToast('하트 수를 1 이상 입력해 주세요.'); heartsInput.focus(); return; }
@@ -460,8 +440,7 @@
 
   function renderUsers() {
     const tbody = document.getElementById('userBody');
-    tbody.innerHTML = '';
-    let totalGlobalSlots = 0;
+    tbody.innerHTML = ''; let totalGlobalSlots = 0;
     
     participants.forEach(p => {
       const autoSlots = calculateAutoSlots(p.hearts);
@@ -497,9 +476,7 @@
     });
   }
 
-  const canvas = document.getElementById('wheelCanvas');
-  const ctx = canvas.getContext('2d');
-  
+  const canvas = document.getElementById('wheelCanvas'); const ctx = canvas.getContext('2d');
   let currentAngle = 0; let isSpinning = false; let isContinuous = false; 
   let lastFrameTime = 0; let currentVelocity = 0; 
 
@@ -567,8 +544,7 @@
   function spinContinuous(now) {
     if (!isContinuous) return;
     if (!lastFrameTime) lastFrameTime = now;
-    let dt = now - lastFrameTime; if (dt > 50) dt = 16;
-    lastFrameTime = now;
+    let dt = now - lastFrameTime; if (dt > 50) dt = 16; lastFrameTime = now;
     
     currentVelocity = 0.048; currentAngle += currentVelocity * dt; drawWheel();
     
@@ -601,12 +577,10 @@
 
     function animateStop(now) {
       if (!lastFrameTime) lastFrameTime = now;
-      let dt = now - lastFrameTime; if (dt > 50) dt = 16;
-      lastFrameTime = now;
+      let dt = now - lastFrameTime; if (dt > 50) dt = 16; lastFrameTime = now;
       
       const friction = Math.pow(0.9994, dt);
-      currentVelocity *= friction; currentAngle += currentVelocity * dt;
-      drawWheel();
+      currentVelocity *= friction; currentAngle += currentVelocity * dt; drawWheel();
       
       const hovered = getCurrentHoveredParticipant();
       if (hovered) document.getElementById('tickOverlay').innerText = hovered.name;
