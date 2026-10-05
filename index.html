@@ -266,7 +266,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-  // 사용자 제공 Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyB8hs8E8bedCBnuciMsW-DHaJ6qQUqUuuc",
     authDomain: "roulette-guestbook.firebaseapp.com",
@@ -289,7 +288,6 @@
         return;
     }
 
-    // URL 및 도메인 필터링 정규식
     const urlRegex = /(https?:\/\/|www\.)|([a-zA-Z0-9-]+\.(com|net|kr|co\.kr|org|io|me|info|biz))/i;
     if(urlRegex.test(name) || urlRegex.test(text)) {
         window.showToast("링크(URL)는 홍보 방지를 위해 등록할 수 없습니다.");
@@ -317,7 +315,6 @@
     const data = snapshot.val();
     
     if(data) {
-        // 객체를 배열로 변환 후 최신순(역순)으로 정렬
         const entries = Object.values(data).reverse(); 
         entries.forEach(entry => {
             const div = document.createElement('div');
@@ -354,7 +351,6 @@
     renderUsers();
     drawWheel();
     
-    // 키보드 엔터 입력 이벤트 리스너 추가
     document.getElementById('userName').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') addParticipant();
     });
@@ -467,7 +463,6 @@
       return; 
     }
     
-    // 엄격한 하트 수 검증 (공백, 문자, 0 이하 차단)
     if (!heartsText || isNaN(hearts) || hearts <= 0) {
       window.showToast('하트 수를 1 이상 입력해 주세요.');
       return;
@@ -476,7 +471,6 @@
     const newId = Date.now();
     addCount++;
     
-    // unshift를 사용하여 새로운 참여자를 배열의 최상단(내림차순)으로 추가
     participants.unshift({
       id: newId,
       name: name,
@@ -490,7 +484,7 @@
 
     nameInput.value = '';
     heartsInput.value = '';
-    nameInput.focus(); // 연속 입력을 위해 포커스 유지
+    nameInput.focus(); 
 
     renderUsers();
     drawWheel();
@@ -527,7 +521,6 @@
         return;
       }
 
-      // 수정할 때도 엄격한 검증 적용
       if (!heartsText || isNaN(newHearts) || newHearts <= 0) {
         window.showToast('하트 수를 1 이상 입력해 주세요.');
         return;
@@ -555,17 +548,17 @@
 
     participants.forEach((p) => {
       const autoSlots = calculateAutoSlots(p.hearts);
-      // 소수점 1자리까지 확률 표시
       const prob = totalGlobalSlots > 0 ? ((p.finalSlots / totalGlobalSlots) * 100).toFixed(1) : "0.0";
 
       const tr = document.createElement('tr');
+      // 엔터키 이벤트를 적용하여 입력 중 엔터를 누르면 즉시 updateParticipant가 호출됨
       tr.innerHTML = `
         <td>${p.order}</td>
         <td>
-          <input type="text" id="name-${p.id}" value="${p.name}" style="font-weight: bold; width: 100%;">
+          <input type="text" id="name-${p.id}" value="${p.name}" style="font-weight: bold; width: 100%;" onkeydown="if(event.key === 'Enter') updateParticipant(${p.id})">
         </td>
         <td>
-          <input type="number" id="hearts-${p.id}" value="${p.hearts}" style="width: 100%;">
+          <input type="number" id="hearts-${p.id}" value="${p.hearts}" style="width: 100%;" onkeydown="if(event.key === 'Enter') updateParticipant(${p.id})">
         </td>
         <td>${autoSlots}칸</td>
         <td>
@@ -742,7 +735,6 @@
       if (dt > 50) dt = 16;
       lastFrameTime = now;
       
-      // 13.45초 동안 지속되는 극적인 감속 마찰 엔진 적용
       const friction = Math.pow(0.9994, dt);
       currentVelocity *= friction;
       currentAngle += currentVelocity * dt;
@@ -779,7 +771,6 @@
 
     if (winner) {
       const overlay = document.getElementById('winnerOverlay');
-      // 간소화된 당첨 메시지 적용 (다음 시작 전까지 사라지지 않음)
       overlay.innerHTML = `🎉 ${window.escapeHTML(winner.name)} 🎉`;
       
       overlay.style.display = 'block';
