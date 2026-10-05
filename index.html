@@ -245,7 +245,7 @@
 </div>
 
 <div class="guestbook-panel">
-  <h3>💬 방명록 및 사용 소감</h3>
+  <h3>💬 방명록 및 사용 후기</h3>
   <div class="comment-input-area">
     <div class="comment-input-row">
       <input type="text" id="gb-name" placeholder="닉네임 (최대 15자)" maxlength="15">
@@ -353,6 +353,15 @@
     renderCriteria();
     renderUsers();
     drawWheel();
+    
+    // 키보드 엔터 입력 이벤트 리스너 추가
+    document.getElementById('userName').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') addParticipant();
+    });
+    
+    document.getElementById('userHearts').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') addParticipant();
+    });
   };
 
   window.escapeHTML = function(str) {
@@ -450,11 +459,18 @@
     const heartsInput = document.getElementById('userHearts');
 
     const name = nameInput.value.trim();
-    const hearts = Number(heartsInput.value) || 0;
+    const heartsText = heartsInput.value.trim();
+    const hearts = Number(heartsText);
 
     if (!name) { 
       window.showToast('참여자 이름을 입력해 주세요.'); 
       return; 
+    }
+    
+    // 엄격한 하트 수 검증 (공백, 문자, 0 이하 차단)
+    if (!heartsText || isNaN(hearts) || hearts <= 0) {
+      window.showToast('하트 수를 1 이상 입력해 주세요.');
+      return;
     }
 
     const newId = Date.now();
@@ -474,6 +490,7 @@
 
     nameInput.value = '';
     heartsInput.value = '';
+    nameInput.focus(); // 연속 입력을 위해 포커스 유지
 
     renderUsers();
     drawWheel();
@@ -502,10 +519,17 @@
       const heartsInput = document.getElementById(`hearts-${id}`);
       
       const newName = nameInput.value.trim();
-      const newHearts = Number(heartsInput.value) || 0;
+      const heartsText = heartsInput.value.trim();
+      const newHearts = Number(heartsText);
       
       if (!newName) {
         window.showToast('참여자 이름을 입력해 주세요.');
+        return;
+      }
+
+      // 수정할 때도 엄격한 검증 적용
+      if (!heartsText || isNaN(newHearts) || newHearts <= 0) {
+        window.showToast('하트 수를 1 이상 입력해 주세요.');
         return;
       }
       
