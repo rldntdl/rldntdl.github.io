@@ -55,97 +55,52 @@
     canvas { border-radius: 50%; box-shadow: 0 0 25px rgba(0,0,0,0.6); }
 
     .tick-overlay {
-      position: absolute;
-      top: 50%; left: 0; width: 100%;
-      transform: translateY(-50%);
-      background: rgba(0, 0, 0, 0.75);
-      color: #fff;
-      font-size: 1.8rem;
-      font-weight: 700;
-      text-align: center;
-      padding: 15px 0;
-      display: none;
-      z-index: 15;
-      pointer-events: none;
+      position: absolute; top: 50%; left: 0; width: 100%; transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.75); color: #fff; font-size: 1.8rem; font-weight: 700; text-align: center;
+      padding: 15px 0; display: none; z-index: 15; pointer-events: none;
     }
 
     .winner-overlay {
-      position: absolute;
-      top: 50%; left: 0; width: 100%;
-      transform: translateY(-50%);
-      background: rgba(0, 0, 0, 0.75); 
-      color: #fff; 
-      font-size: 2.2rem;
-      font-weight: 900;
-      text-align: center;
-      padding: 25px 0;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-      display: none;
-      z-index: 20;
-      pointer-events: none;
-      opacity: 1;
-      transition: none;
+      position: absolute; top: 50%; left: 0; width: 100%; transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.75); color: #fff; font-size: 2.2rem; font-weight: 900; text-align: center;
+      padding: 25px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: none; z-index: 20;
+      pointer-events: none; opacity: 1; transition: none;
     }
 
     .action-buttons { display: flex; gap: 10px; width: 100%; max-width: 450px; margin-top: 20px; }
-    
     .shuffle-btn { flex: 0.2; background: #ffcc00; color: #fff; font-size: 1.3rem; padding: 15px; border-radius: 30px; box-shadow: 0 4px 15px rgba(255,204,0,0.3); }
     .shuffle-btn:hover { background: #e6b800; transform: scale(1.02); }
-    .shuffle-btn:disabled { background: #555; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
+    .shuffle-btn:disabled { background: #555; color: #999; cursor: not-allowed; box-shadow: none; }
     
     .spin-btn { flex: 0.4; background: #2ecc71; color: #fff; font-size: 1.3rem; padding: 15px; border-radius: 30px; box-shadow: 0 4px 15px rgba(46,204,113,0.4); }
     .spin-btn:hover { background: #27ae60; transform: scale(1.02); }
-    .spin-btn:disabled { background: #555; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
+    .spin-btn:disabled { background: #555; color: #999; cursor: not-allowed; box-shadow: none; }
     
     .stop-btn { flex: 0.4; background: #ff3366; color: #fff; font-size: 1.3rem; padding: 15px; border-radius: 30px; box-shadow: 0 4px 15px rgba(255,51,102,0.4); }
     .stop-btn:hover { background: #ff4d79; transform: scale(1.02); }
-    .stop-btn:disabled { background: #555; color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
+    .stop-btn:disabled { background: #555; color: #999; cursor: not-allowed; box-shadow: none; }
 
-    #toast-container {
-      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-      z-index: 9999; display: flex; flex-direction: column; gap: 10px;
-    }
-    .toast {
-      background: #ff3366; color: #fff; padding: 12px 24px; border-radius: 8px;
-      font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      opacity: 0; transform: translateY(-20px); transition: 0.3s all ease;
-    }
+    #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: #ff3366; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.4); opacity: 0; transform: translateY(-20px); transition: 0.3s all ease; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    .info-panel, .guestbook-panel {
-      max-width: 1400px;
-      margin: 25px auto 0;
-      background: #252636;
-      border-radius: 12px;
-      padding: 25px;
-      line-height: 1.8;
-      color: #b8b9cb;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    }
-    .info-panel h3, .guestbook-panel h3 { 
-      color: #ff3366; font-size: 1.2rem; margin-top: 25px; margin-bottom: 12px; border-bottom: 1px solid #3d3f58; padding-bottom: 8px; 
-    }
-    .info-panel h3:first-child, .guestbook-panel h3:first-child { margin-top: 0; }
+    .info-panel { max-width: 1400px; margin: 25px auto 0; background: #252636; border-radius: 12px; padding: 25px; line-height: 1.8; color: #b8b9cb; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .info-panel h3 { color: #ff3366; font-size: 1.2rem; margin-top: 25px; margin-bottom: 12px; border-bottom: 1px solid #3d3f58; padding-bottom: 8px; }
+    .info-panel h3:first-child { margin-top: 0; }
     .info-panel ul { padding-left: 20px; }
 
-    .donate-btn {
-      position: fixed; bottom: 25px; right: 25px; background-color: #0050FF; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); transition: transform 0.2s, background-color 0.2s; z-index: 100; display: flex; align-items: center; gap: 8px;
-    }
-    .donate-btn:hover { transform: scale(1.05); background-color: #003fcb; }
+    .guestbook-panel { max-width: 1400px; margin: 25px auto 60px; background: #252636; border-radius: 12px; padding: 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .guestbook-item { background: #2e3047; padding: 15px; border-radius: 8px; margin-bottom: 10px; word-break: break-all; }
+    .guestbook-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .guestbook-name { color: #ffcc00; font-weight: bold; }
+    .guestbook-date { color: #b8b9cb; font-size: 0.8rem; margin-left: 10px; font-weight: normal; }
+    .reply-btn { background: none; border: none; color: #3498db; cursor: pointer; font-size: 0.9rem; font-weight: bold; }
+    .reply-btn:hover { color: #2980b9; text-decoration: underline; }
+    .admin-reply-box { margin-top: 12px; padding: 12px; background: #1a1a24; border-left: 4px solid #ff3366; border-radius: 6px; }
+    .admin-reply-title { color: #ff3366; font-weight: bold; margin-bottom: 5px; font-size: 0.95rem; }
 
-    /* 방명록 관련 스타일 */
-    .comment-input-area { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .comment-input-row { display: flex; gap: 10px; }
-    .comment-input-area input { flex: 0.3; padding: 10px; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; border-radius: 6px; }
-    .comment-input-area textarea { flex: 1; padding: 10px; background: #1a1a24; border: 1px solid #4a4d6d; color: #fff; border-radius: 6px; resize: none; height: 80px; font-family: 'Pretendard', sans-serif; }
-    .comment-list { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
-    .comment-list::-webkit-scrollbar { width: 8px; }
-    .comment-list::-webkit-scrollbar-thumb { background-color: #4a4d6d; border-radius: 4px; }
-    .comment-item { background: #1a1a24; padding: 15px; border-radius: 8px; border-left: 4px solid #ff3366; }
-    .comment-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
-    .comment-header strong { color: #fff; font-size: 1.05rem; }
-    .comment-time { color: #888; }
-    .comment-body { color: #d0d0e0; word-break: break-all; }
+    .donate-btn { position: fixed; bottom: 25px; right: 25px; background-color: #0050FF; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); transition: transform 0.2s, background-color 0.2s; z-index: 100; display: flex; align-items: center; gap: 8px; }
+    .donate-btn:hover { transform: scale(1.05); background-color: #003fcb; }
   </style>
 </head>
 <body>
@@ -154,7 +109,6 @@
 
 <div class="container">
   <div class="panel left-panel">
-    
     <h2>1. 룰렛 제목 설정</h2>
     <div class="input-group">
       <input type="text" id="titleInput" placeholder="룰렛 제목을 입력하세요">
@@ -168,16 +122,8 @@
       <button class="btn-primary" onclick="addCriteria()">추가</button>
     </div>
     <table id="criteriaTable">
-      <thead>
-        <tr>
-          <th>하트 기준</th>
-          <th>부여 칸수</th>
-          <th>관리</th>
-        </tr>
-      </thead>
-      <tbody id="criteriaBody">
-        <tr><td colspan="3" style="color: #888;">기준을 입력하고 적용을 눌러주세요.</td></tr>
-      </tbody>
+      <thead><tr><th>하트 기준</th><th>부여 칸수</th><th>관리</th></tr></thead>
+      <tbody id="criteriaBody"><tr><td colspan="3" style="color: #888;">기준을 입력하고 적용을 눌러주세요.</td></tr></tbody>
     </table>
 
     <h2>3. 참여자 명단 및 칸수 조정</h2>
@@ -186,7 +132,6 @@
       <input type="number" id="userHearts" placeholder="하트">
       <button class="btn-primary" onclick="addParticipant()">추가</button>
     </div>
-    
     <table>
       <thead>
         <tr>
@@ -199,21 +144,18 @@
           <th style="width: 70px;">관리</th>
         </tr>
       </thead>
-      <tbody id="userBody">
-      </tbody>
+      <tbody id="userBody"></tbody>
     </table>
   </div>
 
   <div class="panel right-panel">
     <h2 id="rouletteTitleDisplay">🌀돌려돌려 돌림판🌀</h2>
-    
     <div class="wheel-container">
       <div class="wheel-pointer"></div>
       <canvas id="wheelCanvas" width="450" height="450"></canvas>
       <div class="tick-overlay" id="tickOverlay"></div>
       <div class="winner-overlay" id="winnerOverlay"></div>
     </div>
-    
     <div class="action-buttons">
       <button class="shuffle-btn" id="shuffleBtn" onclick="shuffleWheel()">섞기</button>
       <button class="spin-btn" id="spinBtn" onclick="spinWheel()">시작</button>
@@ -229,42 +171,31 @@
     <li>인터넷 방송 플랫폼에서 기념일 및 시청자 이벤트 방송 시 활용할 수 있는 자동 룰렛 시스템입니다.</li>
     <li>하트에 따른 룰렛 칸수와 확률 계산을 자동으로 계산하고 효율적으로 보조합니다.</li>
   </ul>
-  
-  <h3>✨ 주요 기능 및 사용 방법</h3>
-  <ul>
-    <li><strong>제목 커스텀:</strong> 이벤트 콘셉트에 맞춰 룰렛 제목을 자유롭게 설정할 수 있습니다.</li>
-    <li><strong>능동적 기준 적용:</strong> 하트에 맞춰 자동으로 룰렛 칸수를 계산하는 기준을 설정합니다.</li>
-    <li><strong>참여자 명단 및 칸수 가감:</strong> 참여자와 하트 등록 후에도 자유롭게 내용을 수정하고 최종 칸수를 조정할 수 있습니다.</li>
-    <li><strong>룰렛판 랜덤 섞기:</strong> '섞기' 버튼을 사용하여 고정된 룰렛판을 무작위로 재배치 할 수 있습니다.</li>
-  </ul>
-
   <h3>✨ 개발자의 부탁 말씀</h3>
   <ul>
     <li>조금이나마 방송에 도움이 됐다고 느끼셨다면 우측 하단의 개발자 후원하기 부탁드리며, 주변 BJ 지인분들께도 홍보 부탁드립니다.</li>
   </ul>
 </div>
 
+<!-- 방명록 섹션 -->
 <div class="guestbook-panel">
-  <h3>💬 방명록 및 사용 후기</h3>
-  <div class="comment-input-area">
-    <div class="comment-input-row">
-      <input type="text" id="gb-name" placeholder="닉네임 (최대 15자)" maxlength="15">
-      <button class="btn-primary" id="btn-gb-submit">등록하기</button>
-    </div>
-    <textarea id="gb-text" placeholder="응원의 메시지나 소감을 남겨주세요! (URL 등 홍보성 문구는 차단됩니다)" maxlength="300"></textarea>
+  <h2>💬 방명록 및 사용 후기</h2>
+  <div class="input-group">
+    <input type="text" id="gbName" placeholder="닉네임 (최대 15자)" maxlength="15" style="max-width: 150px;">
+    <input type="text" id="gbText" placeholder="소감을 남겨주세요 (최대 200자)" maxlength="200">
+    <button class="btn-primary" onclick="submitGuestbook()">등록</button>
   </div>
-  <div id="gb-list" class="comment-list">
-    <div style="color: #888; text-align: center; padding: 20px;">로딩 중...</div>
-  </div>
+  <div id="guestbookList"></div>
 </div>
 
 <a href="https://buymeacoffee.com/rldntdl" target="_blank" class="donate-btn">
   ☕ 개발자 커피 후원하기
 </a>
 
+<!-- Firebase SDK -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB8hs8E8bedCBnuciMsW-DHaJ6qQUqUuuc",
@@ -277,64 +208,100 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const gbRef = ref(db, 'guestbook');
 
-  document.getElementById('btn-gb-submit').addEventListener('click', () => {
-    const name = document.getElementById('gb-name').value.trim();
-    const text = document.getElementById('gb-text').value.trim();
-    
-    if(!name || !text) {
-        window.showToast("닉네임과 내용을 모두 입력해주세요.");
-        return;
+  // 스팸 필터링 정규식
+  const urlRegex = /(http|https|www\.|(?:\.com|\.kr|\.net))/i;
+
+  window.submitGuestbook = function() {
+    const name = document.getElementById('gbName').value.trim();
+    const text = document.getElementById('gbText').value.trim();
+
+    if (!name || !text) {
+      showToast('닉네임과 내용을 모두 입력해주세요.');
+      return;
     }
-
-    const urlRegex = /(https?:\/\/|www\.)|([a-zA-Z0-9-]+\.(com|net|kr|co\.kr|org|io|me|info|biz))/i;
-    if(urlRegex.test(name) || urlRegex.test(text)) {
-        window.showToast("링크(URL)는 홍보 방지를 위해 등록할 수 없습니다.");
-        return;
+    if (urlRegex.test(name) || urlRegex.test(text)) {
+      showToast('링크(URL)는 홍보 방지를 위해 등록할 수 없습니다.');
+      return;
     }
 
     const now = new Date();
-    const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const dateStr = `${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-    push(gbRef, {
-        name: name,
-        text: text,
-        date: dateStr,
-        timestamp: serverTimestamp()
+    push(ref(db, 'guestbook'), { name: name, text: text, date: dateStr, timestamp: Date.now() });
+    
+    document.getElementById('gbName').value = '';
+    document.getElementById('gbText').value = '';
+    showToast('방명록이 등록되었습니다!');
+  };
+
+  // 방명록 실시간 렌더링
+  onValue(ref(db, 'guestbook'), (snapshot) => {
+    const listDiv = document.getElementById('guestbookList');
+    listDiv.innerHTML = '';
+    const entries = [];
+    
+    snapshot.forEach((child) => {
+      entries.push({ key: child.key, ...child.val() });
     });
+    
+    // 최신순 정렬
+    entries.sort((a, b) => b.timestamp - a.timestamp);
 
-    document.getElementById('gb-name').value = '';
-    document.getElementById('gb-text').value = '';
-    window.showToast('방명록이 성공적으로 등록되었습니다.');
+    entries.forEach((data) => {
+      let html = `
+        <div class="guestbook-item">
+          <div class="guestbook-header">
+            <div>
+              <span class="guestbook-name">${data.name}</span>
+              <span class="guestbook-date">${data.date}</span>
+            </div>
+            <button class="reply-btn" onclick="openReplyPrompt('${data.key}')">↳ 답글 달기</button>
+          </div>
+          <div style="color: #fff; line-height: 1.5;">${data.text}</div>
+      `;
+      // 관리자 답글이 존재할 경우
+      if (data.reply) {
+        html += `
+          <div class="admin-reply-box">
+            <div class="admin-reply-title">👑 개발자</div>
+            <div style="color: #ddd;">${data.reply}</div>
+          </div>
+        `;
+      }
+      html += `</div>`;
+      listDiv.insertAdjacentHTML('beforeend', html);
+    });
   });
 
-  onValue(gbRef, (snapshot) => {
-    const list = document.getElementById('gb-list');
-    list.innerHTML = '';
-    const data = snapshot.val();
+  // 관리자 답글 기능 (비밀번호 Base64 인코딩 사용: '1412' -> 'MTQxMg==')
+  window.openReplyPrompt = function(key) {
+    const pass = prompt("관리자 비밀번호를 입력하세요.");
+    if (!pass) return;
     
-    if(data) {
-        const entries = Object.values(data).reverse(); 
-        entries.forEach(entry => {
-            const div = document.createElement('div');
-            div.className = 'comment-item';
-            
-            const safeName = window.escapeHTML(entry.name);
-            const safeText = window.escapeHTML(entry.text).replace(/\n/g, '<br>');
-            
-            div.innerHTML = `
-                <div class="comment-header">
-                    <strong>${safeName}</strong>
-                    <span class="comment-time">${entry.date}</span>
-                </div>
-                <div class="comment-body">${safeText}</div>
-            `;
-            list.appendChild(div);
-        });
-    } else {
-        list.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">아직 작성된 방명록이 없습니다. 첫 소감을 남겨주세요!</div>';
+    if (btoa(pass) !== "MTQxMg==") {
+      showToast("비밀번호가 일치하지 않습니다.");
+      return;
     }
+
+    const replyText = prompt("개발자 답글을 입력하세요:");
+    if (!replyText || replyText.trim() === '') return;
+    
+    if (urlRegex.test(replyText)) {
+      showToast('답글에 URL을 포함할 수 없습니다.');
+      return;
+    }
+
+    update(ref(db, 'guestbook/' + key), { reply: replyText.trim() });
+    showToast("답글이 등록되었습니다.");
+  };
+
+  // 방명록 엔터키 지원
+  document.getElementById('gbText').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') window.submitGuestbook();
+  });
+  document.getElementById('gbName').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('gbText').focus();
   });
 </script>
 
@@ -346,39 +313,16 @@
   
   const colors = ['#f39c12', '#e74c3c', '#9b59b6', '#3498db', '#1abc9c', '#2ecc71', '#e67e22', '#34495e'];
 
-  window.onload = function() {
-    renderCriteria();
-    renderUsers();
-    drawWheel();
-    
-    document.getElementById('userName').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') addParticipant();
-    });
-    
-    document.getElementById('userHearts').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') addParticipant();
-    });
-  };
+  window.onload = function() { renderCriteria(); renderUsers(); drawWheel(); };
 
-  window.escapeHTML = function(str) {
-      return str.replace(/[&<>'"]/g, tag => ({
-          '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-      }[tag] || tag));
-  };
-
-  window.showToast = function(message) {
+  function showToast(message) {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.innerText = message;
     container.appendChild(toast);
-    
     setTimeout(() => toast.classList.add('show'), 10);
-    
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
   }
 
   function updateTitle() {
@@ -394,12 +338,10 @@
 
     if (h > 0 && s > 0) {
       criteriaList.push({ heart: h, slot: s });
-      heartInput.value = '';
-      slotInput.value = '';
-      renderCriteria();
-      recalculateAllUsers();
+      heartInput.value = ''; slotInput.value = '';
+      renderCriteria(); recalculateAllUsers();
     } else {
-      window.showToast('올바른 하트와 칸수를 입력하세요.');
+      showToast('올바른 하트와 칸수를 입력하세요.');
     }
   }
 
@@ -407,103 +349,64 @@
     criteriaList.sort((a, b) => b.heart - a.heart);
     const tbody = document.getElementById('criteriaBody');
     tbody.innerHTML = '';
-    
     if (criteriaList.length === 0) {
       tbody.innerHTML = `<tr><td colspan="3" style="color: #888;">기준을 입력하고 적용을 눌러주세요.</td></tr>`;
       return;
     }
-
     criteriaList.forEach((item, index) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${item.heart.toLocaleString()}</td>
-        <td>${item.slot.toLocaleString()}</td>
-        <td><button class="btn-danger" onclick="deleteCriteria(${index})">삭제</button></td>
-      `;
-      tbody.appendChild(tr);
+      tbody.innerHTML += `<tr><td>${item.heart.toLocaleString()}</td><td>${item.slot.toLocaleString()}</td><td><button class="btn-danger" onclick="deleteCriteria(${index})">삭제</button></td></tr>`;
     });
   }
 
-  function deleteCriteria(index) {
-    criteriaList.splice(index, 1);
-    renderCriteria();
-    recalculateAllUsers();
-  }
-
+  function deleteCriteria(index) { criteriaList.splice(index, 1); renderCriteria(); recalculateAllUsers(); }
+  
   function calculateAutoSlots(hearts) {
-    let remaining = hearts;
-    let totalSlots = 0;
-
+    let remaining = hearts; let totalSlots = 0;
     for (let c of criteriaList) {
       if (c.heart <= 0) continue;
       const count = Math.floor(remaining / c.heart);
-      if (count > 0) {
-        totalSlots += count * c.slot;
-        remaining %= c.heart;
-      }
+      if (count > 0) { totalSlots += count * c.slot; remaining %= c.heart; }
     }
     return totalSlots;
   }
 
-  function recalculateAllUsers() {
-    renderUsers();
-    drawWheel();
-  }
+  function recalculateAllUsers() { renderUsers(); drawWheel(); }
+
+  // 입력창 엔터키 이벤트 (신규 추가용)
+  document.getElementById('userName').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('userHearts').focus();
+  });
+  document.getElementById('userHearts').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') addParticipant();
+  });
 
   function addParticipant() {
     const nameInput = document.getElementById('userName');
     const heartsInput = document.getElementById('userHearts');
-
     const name = nameInput.value.trim();
-    const heartsText = heartsInput.value.trim();
-    const hearts = Number(heartsText);
+    const hearts = Number(heartsInput.value);
 
-    if (!name) { 
-      window.showToast('참여자 이름을 입력해 주세요.'); 
-      return; 
-    }
-    
-    if (!heartsText || isNaN(hearts) || hearts <= 0) {
-      window.showToast('하트 수를 1 이상 입력해 주세요.');
-      return;
-    }
+    if (!name) { showToast('참여자 이름을 입력해 주세요.'); return; }
+    if (!heartsInput.value || hearts <= 0) { showToast('하트 수를 1 이상 입력해 주세요.'); return; }
 
     const newId = Date.now();
     addCount++;
-    
-    participants.unshift({
-      id: newId,
-      name: name,
-      hearts: hearts,
-      adjSlots: 0,
-      finalSlots: 0,
-      order: addCount
-    });
-    
+    participants.unshift({ id: newId, name: name, hearts: hearts, adjSlots: 0, finalSlots: 0, order: addCount });
     wheelOrderIds.push(newId);
 
-    nameInput.value = '';
-    heartsInput.value = '';
-    nameInput.focus(); 
-
-    renderUsers();
-    drawWheel();
+    nameInput.value = ''; heartsInput.value = '';
+    renderUsers(); drawWheel();
   }
 
   function adjustSlot(id, delta) {
     const p = participants.find(part => part.id === id);
-    if (p) {
-      p.adjSlots += delta;
-      renderUsers();
-      drawWheel();
-    }
+    if (p) { p.adjSlots += delta; renderUsers(); drawWheel(); }
   }
 
   function deleteParticipant(id) {
     participants = participants.filter(part => part.id !== id);
     wheelOrderIds = wheelOrderIds.filter(wheelId => wheelId !== id);
-    renderUsers();
-    drawWheel();
+    renderUsers(); drawWheel();
   }
 
   function updateParticipant(id) {
@@ -511,35 +414,29 @@
     if (p) {
       const nameInput = document.getElementById(`name-${id}`);
       const heartsInput = document.getElementById(`hearts-${id}`);
-      
       const newName = nameInput.value.trim();
-      const heartsText = heartsInput.value.trim();
-      const newHearts = Number(heartsText);
+      const newHearts = Number(heartsInput.value);
       
-      if (!newName) {
-        window.showToast('참여자 이름을 입력해 주세요.');
-        return;
-      }
+      if (!newName) { showToast('참여자 이름을 입력해 주세요.'); return; }
+      if (!heartsInput.value || newHearts <= 0) { showToast('하트 수를 1 이상 입력해 주세요.'); return; }
+      
+      p.name = newName; p.hearts = newHearts;
+      renderUsers(); drawWheel(); showToast('적용되었습니다.');
+    }
+  }
 
-      if (!heartsText || isNaN(newHearts) || newHearts <= 0) {
-        window.showToast('하트 수를 1 이상 입력해 주세요.');
-        return;
-      }
-      
-      p.name = newName;
-      p.hearts = newHearts;
-      
-      renderUsers();
-      drawWheel();
-      window.showToast('참여자 정보가 수정되었습니다.');
+  function handleTableEnter(event, id) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // 기본 동작 막기
+      updateParticipant(id);
     }
   }
 
   function renderUsers() {
     const tbody = document.getElementById('userBody');
     tbody.innerHTML = '';
-
     let totalGlobalSlots = 0;
+    
     participants.forEach(p => {
       const autoSlots = calculateAutoSlots(p.hearts);
       p.finalSlots = Math.max(0, autoSlots + p.adjSlots);
@@ -551,15 +448,10 @@
       const prob = totalGlobalSlots > 0 ? ((p.finalSlots / totalGlobalSlots) * 100).toFixed(1) : "0.0";
 
       const tr = document.createElement('tr');
-      // 엔터키 이벤트를 적용하여 입력 중 엔터를 누르면 즉시 updateParticipant가 호출됨
       tr.innerHTML = `
         <td>${p.order}</td>
-        <td>
-          <input type="text" id="name-${p.id}" value="${p.name}" style="font-weight: bold; width: 100%;" onkeydown="if(event.key === 'Enter') updateParticipant(${p.id})">
-        </td>
-        <td>
-          <input type="number" id="hearts-${p.id}" value="${p.hearts}" style="width: 100%;" onkeydown="if(event.key === 'Enter') updateParticipant(${p.id})">
-        </td>
+        <td><input type="text" id="name-${p.id}" value="${p.name}" style="font-weight: bold; width: 100%;" onkeypress="handleTableEnter(event, ${p.id})"></td>
+        <td><input type="number" id="hearts-${p.id}" value="${p.hearts}" style="width: 100%;" onkeypress="handleTableEnter(event, ${p.id})"></td>
         <td>${autoSlots}칸</td>
         <td>
           <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
@@ -567,10 +459,7 @@
             <button class="adj-btn btn-minus" onclick="adjustSlot(${p.id}, -1)">-</button>
           </div>
         </td>
-        <td style="color:#ffcc00; font-weight:bold;">
-          ${p.finalSlots}칸<br>
-          <span style="font-size: 0.8rem; color:#b8b9cb;">(${prob}%)</span>
-        </td>
+        <td style="color:#ffcc00; font-weight:bold;">${p.finalSlots}칸<br><span style="font-size: 0.8rem; color:#b8b9cb;">(${prob}%)</span></td>
         <td>
           <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
             <button class="btn-info" style="width:50px; font-size:12px;" onclick="updateParticipant(${p.id})">적용</button>
@@ -585,76 +474,49 @@
   const canvas = document.getElementById('wheelCanvas');
   const ctx = canvas.getContext('2d');
   
-  let currentAngle = 0;
-  let isSpinning = false;
-  let isContinuous = false; 
-  let lastFrameTime = 0; 
-  let currentVelocity = 0; 
+  let currentAngle = 0; let isSpinning = false; let isContinuous = false; 
+  let lastFrameTime = 0; let currentVelocity = 0; 
 
   function shuffleWheel() {
     if (wheelOrderIds.length === 0 || isSpinning) return;
-    
     for (let i = wheelOrderIds.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [wheelOrderIds[i], wheelOrderIds[j]] = [wheelOrderIds[j], wheelOrderIds[i]];
     }
-    
     drawWheel();
   }
 
   function drawWheel() {
     const totalSlotsSum = participants.reduce((sum, p) => sum + (p.finalSlots || 0), 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const radius = centerX - 10;
+    const centerX = canvas.width / 2; const centerY = canvas.height / 2; const radius = centerX - 10;
 
     if (participants.length === 0 || totalSlotsSum === 0) {
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.fillStyle = '#33354a';
-      ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = '18px sans-serif';
-      ctx.textAlign = 'center';
+      ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#33354a'; ctx.fill(); ctx.fillStyle = '#fff';
+      ctx.font = '18px sans-serif'; ctx.textAlign = 'center';
       ctx.fillText('참여자를 추가해주세요', centerX, centerY);
       return;
     }
 
     let startAngle = currentAngle;
-
     wheelOrderIds.forEach((id, i) => {
       const p = participants.find(part => part.id === id);
       if (!p || p.finalSlots <= 0) return;
-
       const sliceAngle = (p.finalSlots / totalSlotsSum) * (Math.PI * 2);
       const endAngle = startAngle + sliceAngle;
 
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-      ctx.closePath();
-
-      ctx.fillStyle = colors[i % colors.length];
-      ctx.fill();
-      ctx.strokeStyle = '#252636';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle); ctx.closePath();
+      ctx.fillStyle = colors[i % colors.length]; ctx.fill();
+      ctx.strokeStyle = '#252636'; ctx.lineWidth = 2; ctx.stroke();
 
       ctx.save();
-      ctx.translate(centerX, centerY);
-      ctx.rotate(startAngle + sliceAngle / 2);
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#fff';
+      ctx.translate(centerX, centerY); ctx.rotate(startAngle + sliceAngle / 2);
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
       ctx.font = 'bold 16px sans-serif';
-      
-      if (sliceAngle > 0.08) { 
-        ctx.fillText(`${p.name}`, radius - 20, 0);
-      }
+      if (sliceAngle > 0.08) ctx.fillText(`${p.name}`, radius - 20, 0);
       ctx.restore();
-
       startAngle = endAngle;
     });
   }
@@ -662,19 +524,15 @@
   function getCurrentHoveredParticipant() {
     const totalSlotsSum = participants.reduce((sum, p) => sum + (p.finalSlots || 0), 0);
     if (totalSlotsSum === 0) return null;
-
     let normalizedAngle = (Math.PI * 2 - (currentAngle % (Math.PI * 2)) - Math.PI / 2) % (Math.PI * 2);
     if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
-
+    
     let currentSumAngle = 0;
     for (let id of wheelOrderIds) {
       const p = participants.find(part => part.id === id);
       if (!p || p.finalSlots <= 0) continue;
-
       const sliceAngle = (p.finalSlots / totalSlotsSum) * (Math.PI * 2);
-      if (normalizedAngle >= currentSumAngle && normalizedAngle < currentSumAngle + sliceAngle) {
-        return p;
-      }
+      if (normalizedAngle >= currentSumAngle && normalizedAngle < currentSumAngle + sliceAngle) return p;
       currentSumAngle += sliceAngle;
     }
     return null;
@@ -682,21 +540,14 @@
 
   function spinContinuous(now) {
     if (!isContinuous) return;
-    
     if (!lastFrameTime) lastFrameTime = now;
-    let dt = now - lastFrameTime;
-    if (dt > 50) dt = 16;
+    let dt = now - lastFrameTime; if (dt > 50) dt = 16;
     lastFrameTime = now;
     
-    currentVelocity = 0.048; 
-    currentAngle += currentVelocity * dt; 
-    drawWheel();
+    currentVelocity = 0.048; currentAngle += currentVelocity * dt; drawWheel();
     
     const hovered = getCurrentHoveredParticipant();
-    if (hovered) {
-      document.getElementById('tickOverlay').innerText = hovered.name;
-    }
-    
+    if (hovered) document.getElementById('tickOverlay').innerText = hovered.name;
     requestAnimationFrame(spinContinuous);
   }
 
@@ -704,47 +555,35 @@
     const totalSlotsSum = participants.reduce((sum, p) => sum + (p.finalSlots || 0), 0);
     if (isSpinning || totalSlotsSum === 0) return;
 
-    isSpinning = true;
-    isContinuous = true;
-    lastFrameTime = 0;
-    
+    isSpinning = true; isContinuous = true; lastFrameTime = 0;
     document.getElementById('shuffleBtn').disabled = true; 
     document.getElementById('spinBtn').disabled = true;
     document.getElementById('stopBtn').disabled = false;
     
     const inputs = document.querySelectorAll('#userBody input');
     const btns = document.querySelectorAll('#userBody button');
-    inputs.forEach(input => input.disabled = true);
-    btns.forEach(btn => btn.disabled = true);
+    inputs.forEach(input => input.disabled = true); btns.forEach(btn => btn.disabled = true);
     
     document.getElementById('winnerOverlay').style.display = 'none';
     document.getElementById('tickOverlay').style.display = 'block';
-
     requestAnimationFrame(spinContinuous);
   }
 
   function stopWheel() {
     if (!isContinuous) return;
-    
-    isContinuous = false; 
-    document.getElementById('stopBtn').disabled = true; 
+    isContinuous = false; document.getElementById('stopBtn').disabled = true; 
 
     function animateStop(now) {
       if (!lastFrameTime) lastFrameTime = now;
-      let dt = now - lastFrameTime;
-      if (dt > 50) dt = 16;
+      let dt = now - lastFrameTime; if (dt > 50) dt = 16;
       lastFrameTime = now;
       
       const friction = Math.pow(0.9994, dt);
-      currentVelocity *= friction;
-      currentAngle += currentVelocity * dt;
-
+      currentVelocity *= friction; currentAngle += currentVelocity * dt;
       drawWheel();
       
       const hovered = getCurrentHoveredParticipant();
-      if (hovered) {
-        document.getElementById('tickOverlay').innerText = hovered.name;
-      }
+      if (hovered) document.getElementById('tickOverlay').innerText = hovered.name;
 
       if (currentVelocity > 0.000015) {
         requestAnimationFrame(animateStop);
@@ -755,27 +594,21 @@
         
         const inputs = document.querySelectorAll('#userBody input');
         const btns = document.querySelectorAll('#userBody button');
-        inputs.forEach(input => input.disabled = false);
-        btns.forEach(btn => btn.disabled = false);
+        inputs.forEach(input => input.disabled = false); btns.forEach(btn => btn.disabled = false);
         
         document.getElementById('tickOverlay').style.display = 'none';
         calculateWinner();
       }
     }
-
     requestAnimationFrame(animateStop);
   }
 
   function calculateWinner() {
     const winner = getCurrentHoveredParticipant();
-
     if (winner) {
       const overlay = document.getElementById('winnerOverlay');
-      overlay.innerHTML = `🎉 ${window.escapeHTML(winner.name)} 🎉`;
-      
-      overlay.style.display = 'block';
-      overlay.style.opacity = '1';
-      overlay.style.transition = 'none'; 
+      overlay.innerHTML = `🎉 ${winner.name} 🎉`;
+      overlay.style.display = 'block'; overlay.style.opacity = '1'; overlay.style.transition = 'none'; 
     }
   }
 </script>
