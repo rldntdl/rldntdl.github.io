@@ -178,7 +178,6 @@
   </ul>
 </div>
 
-<!-- 방명록 섹션 -->
 <div class="guestbook-panel">
   <h2>💬 방명록 및 사용 후기</h2>
   <div class="input-group">
@@ -193,7 +192,6 @@
   ☕ 개발자 커피 후원하기
 </a>
 
-<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
   import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
@@ -210,7 +208,6 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // 스팸 필터링 정규식
   const urlRegex = /(http|https|www\.|(?:\.com|\.kr|\.net))/i;
 
   window.submitGuestbook = function() {
@@ -236,7 +233,6 @@
     showToast('방명록이 등록되었습니다!');
   };
 
-  // 방명록 실시간 렌더링
   onValue(ref(db, 'guestbook'), (snapshot) => {
     const listDiv = document.getElementById('guestbookList');
     listDiv.innerHTML = '';
@@ -246,7 +242,6 @@
       entries.push({ key: child.key, ...child.val() });
     });
     
-    // 최신순 정렬
     entries.sort((a, b) => b.timestamp - a.timestamp);
 
     entries.forEach((data) => {
@@ -261,7 +256,6 @@
           </div>
           <div style="color: #fff; line-height: 1.5;">${data.text}</div>
       `;
-      // 관리자 답글이 존재할 경우
       if (data.reply) {
         html += `
           <div class="admin-reply-box">
@@ -275,7 +269,6 @@
     });
   });
 
-  // 관리자 답글 기능 (비밀번호 Base64 인코딩 사용: '1412' -> 'MTQxMg==')
   window.openReplyPrompt = function(key) {
     const pass = prompt("관리자 비밀번호를 입력하세요.");
     if (!pass) return;
@@ -297,7 +290,6 @@
     showToast("답글이 등록되었습니다.");
   };
 
-  // 방명록 엔터키 지원
   document.getElementById('gbText').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') window.submitGuestbook();
   });
@@ -331,19 +323,39 @@
     document.getElementById('rouletteTitleDisplay').innerText = titleText;
   }
 
+  // --- 2. 하트/칸수 기준 설정 부분 개선 ---
+  document.getElementById('newHeart').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('newSlot').focus();
+  });
+  document.getElementById('newSlot').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') addCriteria();
+  });
+
   function addCriteria() {
     const heartInput = document.getElementById('newHeart');
     const slotInput = document.getElementById('newSlot');
     const h = Number(heartInput.value);
     const s = Number(slotInput.value);
 
-    if (h > 0 && s > 0) {
-      criteriaList.push({ heart: h, slot: s });
-      heartInput.value = ''; slotInput.value = '';
-      renderCriteria(); recalculateAllUsers();
-    } else {
-      showToast('올바른 하트와 칸수를 입력하세요.');
+    if (!heartInput.value || h <= 0) { 
+      showToast('하트 기준을 1 이상 입력해 주세요.'); 
+      heartInput.focus(); // 오류 시 포커스 되돌림
+      return; 
     }
+    if (!slotInput.value || s <= 0) { 
+      showToast('부여 칸수를 1 이상 입력해 주세요.'); 
+      slotInput.focus(); // 오류 시 포커스 되돌림
+      return; 
+    }
+
+    criteriaList.push({ heart: h, slot: s });
+    heartInput.value = ''; 
+    slotInput.value = '';
+    renderCriteria(); 
+    recalculateAllUsers();
+    
+    // 추가 완료 후 다시 하트 입력창으로 자동 포커스
+    heartInput.focus();
   }
 
   function renderCriteria() {
@@ -373,7 +385,7 @@
 
   function recalculateAllUsers() { renderUsers(); drawWheel(); }
 
-  // 입력창 엔터키 이벤트 (신규 추가용)
+  // --- 3. 참여자 명단 추가 부분 ---
   document.getElementById('userName').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') document.getElementById('userHearts').focus();
   });
@@ -387,16 +399,29 @@
     const name = nameInput.value.trim();
     const hearts = Number(heartsInput.value);
 
-    if (!name) { showToast('참여자 이름을 입력해 주세요.'); return; }
-    if (!heartsInput.value || hearts <= 0) { showToast('하트 수를 1 이상 입력해 주세요.'); return; }
+    if (!name) { 
+      showToast('참여자 이름을 입력해 주세요.'); 
+      nameInput.focus();
+      return; 
+    }
+    if (!heartsInput.value || hearts <= 0) { 
+      showToast('하트 수를 1 이상 입력해 주세요.'); 
+      heartsInput.focus();
+      return; 
+    }
 
     const newId = Date.now();
     addCount++;
     participants.unshift({ id: newId, name: name, hearts: hearts, adjSlots: 0, finalSlots: 0, order: addCount });
     wheelOrderIds.push(newId);
 
-    nameInput.value = ''; heartsInput.value = '';
-    renderUsers(); drawWheel();
+    nameInput.value = ''; 
+    heartsInput.value = '';
+    renderUsers(); 
+    drawWheel();
+    
+    // 추가 후 다시 참여자 이름 입력창으로 포커스
+    nameInput.focus();
   }
 
   function adjustSlot(id, delta) {
@@ -418,8 +443,8 @@
       const newName = nameInput.value.trim();
       const newHearts = Number(heartsInput.value);
       
-      if (!newName) { showToast('참여자 이름을 입력해 주세요.'); return; }
-      if (!heartsInput.value || newHearts <= 0) { showToast('하트 수를 1 이상 입력해 주세요.'); return; }
+      if (!newName) { showToast('참여자 이름을 입력해 주세요.'); nameInput.focus(); return; }
+      if (!heartsInput.value || newHearts <= 0) { showToast('하트 수를 1 이상 입력해 주세요.'); heartsInput.focus(); return; }
       
       p.name = newName; p.hearts = newHearts;
       renderUsers(); drawWheel(); showToast('적용되었습니다.');
